@@ -3,6 +3,7 @@
 `dogcrud` is a command line tool for working with Datadog CRUD resources, like
 dashboards, monitors, and log pipelines.
 
+[![CI - Test](https://github.com/drichardson/dogcrud/actions/workflows/ci.yaml/badge.svg)](https://github.com/drichardson/dogcrud/actions/workflows/ci.yaml)
 [![PyPI - Version](https://img.shields.io/pypi/v/dogcrud.svg)](https://pypi.org/project/dogcrud)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dogcrud.svg)](https://pypi.org/project/dogcrud)
 
