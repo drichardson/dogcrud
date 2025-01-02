@@ -16,6 +16,7 @@ Builds](https://hatch.pypa.io/latest/build/)
 in. You can also run nvim after `hatch shell`, but if you have a complex
 terminal setup, this can interfere.
 - If you want to clear out your environment, `exit` and then run `hatch env remove`.
+- `hatch fmt` - lint and format code
 
 
 ## Example session

@@ -7,11 +7,7 @@ import aiofiles
 import click
 
 from dogcrud.core.context import config_context
-from dogcrud.core.data import (
-    ResourceWithId,
-    model_validate_json_file,
-    resource_type_for_filename,
-)
+from dogcrud.core.data import resource_type_for_filename
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +25,11 @@ def restore(filename: str) -> None:
 
 async def async_restore(filename: str) -> None:
     rt = resource_type_for_filename(filename)
-    resource = model_validate_json_file(ResourceWithId, filename)
+    resource_id = rt.resource_id(filename)
     async with aiofiles.open(filename, "rb") as file:
-        data = file.read()
-    resource_path = rt.rest_path(resource.id)
+        get_data = await file.read()
+    put_data = rt.transform_get_to_put(get_data)
+    resource_path = rt.rest_path(resource_id)
     logger.info(f"Restoring {resource_path} from {filename}")
-    await rt.put(resource.id, data)
+    await rt.put(resource_id, put_data)
     logger.info(f"Restored {resource_path}")

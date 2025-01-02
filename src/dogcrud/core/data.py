@@ -5,24 +5,9 @@ import asyncio
 import os
 
 import aiofiles
-from pydantic import BaseModel
 
 from dogcrud.core.resource_type import ResourceType
 from dogcrud.core.resource_type_registry import resource_types
-
-
-class ResourceWithId(BaseModel):
-    id: str | int
-
-
-def model_validate_json_file[T: BaseModel](cls: type[T], filename: str) -> T:
-    """
-    Load a Pydantic BaseModel sub-class from a JSON filename.
-
-    Raises an exception on failure.
-    """
-    with open(filename) as file:
-        return cls.model_validate_json(file.read())
 
 
 async def write_formatted_json(json: bytes, filename: str) -> None:

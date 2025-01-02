@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from collections.abc import Sequence
+from functools import partial
 
 from dogcrud.core.pagination import (
     IDOffsetPagination,
@@ -10,12 +11,15 @@ from dogcrud.core.pagination import (
 )
 from dogcrud.core.resource_type import ResourceType
 from dogcrud.core.standard_resource_types import StandardResourceType
+from dogcrud.core.transformers import data_at_key
 
 
 def resource_types() -> Sequence[ResourceType]:
     """
     The Datadog Resource type definitions that are used to provide common CLI
     implementations for each type.
+
+    https://docs.datadoghq.com/api/latest/
     """
     return (
         StandardResourceType(
@@ -35,5 +39,13 @@ def resource_types() -> Sequence[ResourceType]:
             webpage_base_path="logs/pipelines/pipeline/edit",
             max_concurrency=100,
             pagination_strategy=NoPagination(),
+        ),
+        StandardResourceType(
+            rest_base_path="v1/slo",
+            webpage_base_path="slo",
+            max_concurrency=100,
+            pagination_strategy=ItemOffsetPagination(offset_query_param="offset", items_key="data"),
+            webpage_suffix="/edit",
+            get_to_put_transformer=partial(data_at_key, "data"),
         ),
     )
