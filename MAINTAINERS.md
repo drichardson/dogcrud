@@ -1,12 +1,27 @@
 # Maintainers Guide
 
-This package is developed using [Hatch](https://hatch.pypa.io/latest/). Install
-Hatch and then you will use the following command durings development:
+This package is developed using [Hatch](https://hatch.pypa.io/latest/). You'll
+need to install hatch (e.g. `brew install hatch` on macos).
 
-- `hatch env create` - see [Hatch
-Environments](https://hatch.pypa.io/latest/environment/)
-- `hatch shell` and then other commands like `python -m dogcrud.cli`
-- `hatch run python -m dogcrud.cli.main`
-- `hatch build` - see [Hatch Builds](https://hatch.pypa.io/latest/build/)
-- `hatch test`
-- `hatch run pip install -e .` to test installed build
+
+## Some `hatch` commands you will use
+
+- `hatch shell` - to setup the environment (if necessary) and enter a
+development environment so that you can run `dogcrud` while making changes on
+the source. Environments](https://hatch.pypa.io/latest/environment/)
+- `hatch build` - to build source and wheel distributions. See [Hatch
+Builds](https://hatch.pypa.io/latest/build/)
+- `hatch test` - to run tests (at the time of this writing, there are none)
+- `hatch run nvim` - open up NeoVim in the same environment you're developing
+in. You can also run nvim after `hatch shell`, but if you have a complex
+terminal setup, this can interfere.
+- If you want to clear out your environment, `exit` and then run `hatch env remove`.
+
+
+## Example session
+
+```console
+$ hatch shell
+$ dogcrud
+Usage: dogcrud [OPTIONS] COMMAND [ARGS]...
+```
