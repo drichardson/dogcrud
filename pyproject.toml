@@ -35,7 +35,7 @@ Issues = "https://github.com/drichardson/dogcrud/issues"
 Source = "https://github.com/drichardson/dogcrud.git"
 
 [project.scripts]
-dogcrud = "dogcrud.cli.main:main"
+dogcrud = "dogcrud.cli.main:cli"
 
 [tool.hatch.version]
 path = "src/dogcrud/__about__.py"

@@ -97,10 +97,4 @@ cli.add_command(save)
 cli.add_command(restore)
 cli.add_command(open_in_browser)
 
-
-def main():
-    cli.main(prog_name="dog")
-
-
-if __name__ == "__main__":
-    main()
+cli.main()
