@@ -1,6 +1,7 @@
 name: publish
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
@@ -24,4 +25,6 @@ jobs:
     - name: Upload distributions.
       run: hatch publish
       env:
+        HATCH_INDEX_USER: __token__
         HATCH_INDEX_AUTH: ${{ secrets.HATCH_INDEX_AUTH }}
+        HATCH_INDEX_REPO: ${{ vars.HATCH_INDEX_REPO }}
