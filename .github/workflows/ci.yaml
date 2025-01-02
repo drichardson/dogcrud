@@ -1,0 +1,23 @@
+name: ci
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Hatch
+        uses: pypa/hatch@install
+
+      - name: Formatting and checks
+        run: hatch fmt
+
+      - name: Run Tests
+        run: hatch test
