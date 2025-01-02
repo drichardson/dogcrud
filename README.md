@@ -14,6 +14,16 @@ dashboards, monitors, and log pipelines.
 pip install dogcrud
 ```
 
+# Usage
+
+Save all Datadog sources supported by `dogcrud`:
+
+```console
+dogcrud save all
+```
+
+Run `dogcrud` to see how to restore and open saved JSON files.
+
 # Shell Completion
 
 `dogcrud` supports command line completion.
