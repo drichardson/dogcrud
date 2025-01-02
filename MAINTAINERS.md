@@ -19,10 +19,22 @@ terminal setup, this can interfere.
 - `hatch fmt` - lint and format code
 
 
-## Example session
+### Example session
 
 ```console
 $ hatch shell
 $ dogcrud
 Usage: dogcrud [OPTIONS] COMMAND [ARGS]...
 ```
+
+## Publishing
+
+To publish a release to [PyPI](https://pypi.org/project/dogcrud/):
+
+1. Create a PR to bump the version. Run `hatch version` and then `hatch version NEW_VERSION` to bump.
+2. Merge the PR to main
+3. Go to [releases](https://github.com/drichardson/dogcrud/releases).
+4. Draft a new release.
+5. Create a new tag that matches the hatch version.
+6. Press _Generate release notes_.
+7. Publish release
