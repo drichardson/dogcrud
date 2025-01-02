@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dogcrud"
+dynamic = ["version"]
+description = "Datadog CRUD resources from the command line."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+	"aiofiles~=24.1.0",
+	"aiohttp[speedups]~=3.11.11",
+	"click~=8.1.8",
+	"orjson~=3.10.13",
+	"pydantic~=2.10.4",
+]
+authors = [
+  {name = "Doug Richardson", email = "git@rekt.email"},
+]
+
+classifiers = [
+	"Development Status :: 4 - Beta",
+	"Intended Audience :: Developers",
+	"License :: OSI Approved :: MIT License",
+	"Programming Language :: Python :: 3.13",
+	"Topic :: System :: Monitoring",
+]
+
+keywords = ["datadog", "cli"]
+
+[project.urls]
+Documentation = "https://github.com/drichardson/dogcrud"
+Issues = "https://github.com/drichardson/dogcrud/issues"
+Source = "https://github.com/drichardson/dogcrud.git"
+
+[project.scripts]
+dogcrud = "dogcrud.cli.main:main"
+
+[tool.hatch.version]
+path = "src/dogcrud/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/dogcrud tests}"
+
+[tool.coverage.run]
+source_pkgs = ["dogcrud", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/dogcrud/__about__.py",
+]
+
+[tool.coverage.paths]
+dogcrud = ["src/dogcrud", "*/dogcrud/src/dogcrud"]
+tests = ["tests", "*/dogcrud/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.ruff.lint]
+ignore = ["G004"]
