@@ -1,6 +1,6 @@
 # dogcrud
 
-dogcrud is a command line tool for working with Datadog CRUD resources, like
+`dogcrud` is a command line tool for working with Datadog CRUD resources, like
 dashboards, monitors, and log pipelines.
 
 [![PyPI - Version](https://img.shields.io/pypi/v/dogcrud.svg)](https://pypi.org/project/dogcrud)
@@ -15,26 +15,21 @@ pip install dogcrud
 
 # Shell Completion
 
-Supports completion via [click shell completion](https://click.palletsprojects.com/en/stable/shell-completion/).
+`dogcrud` supports command line completion.
 
-Example
-```console
-source <(_DOGCRUD_COMPLETE=bash_source dogcrud)
-```
-
-For bash, add this to `~/.bashrc`:
+For `bash`, add this to `~/.bashrc`:
 
 ```bash
 eval "$(_DOGCRUD_COMPLETE=bash_source dogcrud)"
 ```
 
-For zsh, add this to `~/.zshrc`:
+For `zsh`, add this to `~/.zshrc`:
 
 ```zsh
 eval "$(_DOGCRUD_COMPLETE=zsh_source dogcrud)"
 ```
 
-For fish, add this to `~/.config/fish/completions/dogcrud.fish`:
+For `fish`, add this to `~/.config/fish/completions/dogcrud.fish`:
 
 ```fish
 _DOGCRUD_COMPLETE=fish_source dogcrud | source
