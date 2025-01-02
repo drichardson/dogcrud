@@ -23,3 +23,5 @@ jobs:
 
     - name: Upload distributions.
       run: hatch publish
+      env:
+        HATCH_INDEX_AUTH: ${{ secrets.HATCH_INDEX_AUTH }}
