@@ -48,4 +48,10 @@ def resource_types() -> Sequence[ResourceType]:
             webpage_suffix="/edit",
             get_to_put_transformer=partial(data_at_key, "data"),
         ),
+        StandardResourceType(
+            rest_base_path="v2/logs/config/metrics",
+            webpage_base_path="logs/pipelines/generate-metrics",
+            max_concurrency=100,
+            pagination_strategy=NoPagination(items_key="data"),
+        ),
     )
