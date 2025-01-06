@@ -10,8 +10,11 @@ dashboards, monitors, and log pipelines.
 
 ## Installation
 
+The recommended installation is to use [pipx](https://pipx.pypa.io/stable/), a tool
+for installing Python based command line tools like `dogcrud`.
+
 ```console
-pip install dogcrud
+pipx install dogcrud
 ```
 
 # Usage
