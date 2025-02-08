@@ -10,12 +10,13 @@ dashboards, monitors, and log pipelines.
 
 ## Installation
 
-The recommended installation is to use [pipx](https://pipx.pypa.io/stable/), a tool
+The recommended installation is to use [uv](https://docs.astral.sh/uv/guides/tools/), a tool
 for installing Python based command line tools like `dogcrud`.
 
 ```console
-pipx install dogcrud
+uv tool install dogcrud
 ```
+
 
 # Usage
 
