@@ -4,13 +4,14 @@
 from collections.abc import Sequence
 from functools import partial
 
+from dogcrud.core.metric_resource_type import MetricResourceType
 from dogcrud.core.pagination import (
     IDOffsetPagination,
     ItemOffsetPagination,
     NoPagination,
 )
 from dogcrud.core.resource_type import ResourceType
-from dogcrud.core.standard_resource_types import StandardResourceType
+from dogcrud.core.standard_resource_type import StandardResourceType
 from dogcrud.core.transformers import data_at_key
 
 
@@ -53,5 +54,8 @@ def resource_types() -> Sequence[ResourceType]:
             webpage_base_path="logs/pipelines/generate-metrics",
             max_concurrency=100,
             pagination_strategy=NoPagination(items_key="data"),
+        ),
+        MetricResourceType(
+            max_concurrency=100,
         ),
     )

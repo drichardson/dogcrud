@@ -31,7 +31,7 @@ async def get_json(path: str) -> bytes:
     Documentation for Datadog APIs can be found at
     https://docs.datadoghq.com/api/latest/.
     """
-    url = f"https://api.datadoghq.com/{path}"
+    url = path if path.startswith("https://") else f"https://api.datadoghq.com/{path}"
     headers = {"accept": "application/json"}
     ratelimit_reset = 0.0
 
