@@ -5,9 +5,10 @@ import asyncio
 import logging
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
-from typing import Protocol, override
+from typing import Any, Protocol, assert_never, override
 
 import orjson
+from pydantic import BaseModel
 
 from dogcrud.core.resource_type import IDType
 from dogcrud.core.rest import get_json
@@ -15,9 +16,29 @@ from dogcrud.core.rest import get_json
 logger = logging.getLogger(__name__)
 
 
+class Page(Protocol):
+    def get_ids(self) -> Sequence[IDType]: ...
+    def get_items(self) -> Sequence[Any]: ...
+    def get_parsed_json(self) -> Any: ...
+
+
 @dataclass(frozen=True)
-class Page:
+class PageImpl:
     ids: Sequence[IDType]
+    items: Sequence[Any]
+    parsed_json: Any
+
+    @override
+    def get_ids(self) -> Sequence[IDType]:
+        return self.ids
+
+    @override
+    def get_items(self) -> Sequence[Any]:
+        return self.items
+
+    @override
+    def get_parsed_json(self) -> Any:
+        return self.parsed_json
 
 
 class PaginationStrategy(Protocol):
@@ -38,7 +59,7 @@ async def _get_page(url: str, items_key: str | None) -> Page:
             raise RuntimeError(msg)
 
     ids = [item["id"] for item in items]
-    return Page(ids=ids)
+    return PageImpl(ids=ids, items=items, parsed_json=parsed_json)
 
 
 @dataclass(frozen=True)
@@ -123,3 +144,59 @@ class NoPagination(PaginationStrategy):
         async with concurrency_semaphore:
             page = await _get_page(url, self.items_key)
         yield page
+
+
+class CursorPaginationModel(BaseModel):
+    next_cursor: str | None
+
+
+class CursorMetadataModel(BaseModel):
+    pagination: CursorPaginationModel
+
+
+class CursorLinksModel(BaseModel):
+    first: str | None
+    last: str | None
+    next: str | None
+    prev: str | None
+    self: str | None
+
+
+class CursorDataItemModel(BaseModel):
+    class Config:
+        extra = "allow"
+
+    id: str
+
+
+class CursorPageModel(BaseModel):
+    data: list[CursorDataItemModel]
+    links: CursorLinksModel
+    meta: CursorMetadataModel
+
+
+@dataclass(frozen=True)
+class CursorPagination(PaginationStrategy):
+    """
+    A pagination strategy based on last seen page cursor.
+    """
+
+    query_params: str = ""
+
+    @override
+    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncIterator[CursorPageModel]:
+        next_url = f"{url}?{self.query_params}&page[size]=1000&page[cursor]="
+        while True:
+            async with concurrency_semaphore:
+                json = await get_json(next_url)
+                page = CursorPageModel.model_validate_json(json)
+
+            yield page
+
+            match page.links.next:
+                case None:
+                    return
+                case str() as next:
+                    next_url = next
+                case never:
+                    assert_never(never)
