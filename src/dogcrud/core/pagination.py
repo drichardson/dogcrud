@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Any, Protocol, assert_never, override
 
 import orjson
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from dogcrud.core.resource_type import IDType
 from dogcrud.core.rest import get_json
@@ -163,8 +163,7 @@ class CursorLinksModel(BaseModel):
 
 
 class CursorDataItemModel(BaseModel):
-    class Config:
-        extra = "allow"
+    model_config = ConfigDict(extra='allow')
 
     id: str
 
