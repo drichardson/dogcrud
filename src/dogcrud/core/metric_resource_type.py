@@ -8,13 +8,35 @@ from pathlib import Path
 from typing import override
 
 import aiofiles
+from pydantic import BaseModel
 
-from dogcrud.core import context
+from dogcrud.core import context, rest
 from dogcrud.core.pagination import CursorDataItemModel, CursorPagination
 from dogcrud.core.resource_type import IDType, ResourceType
 
 logger = logging.getLogger(__name__)
 
+
+class MetricTagAggregationModel(BaseModel):
+    space: str
+    time: str
+
+
+class MetricTagAttributesModel(BaseModel):
+    aggregations: list[MetricTagAggregationModel] | None = None
+    exclude_tags_mode: bool | None = None
+    include_percentiles: bool | None = None
+    tags: list[str] | None = None
+
+
+class MetricTagDataModel(BaseModel):
+    attributes: MetricTagAttributesModel | None = None
+    id: str
+    type: str
+
+
+class MetricTagModel(BaseModel):
+    data: MetricTagDataModel
 
 class MetricResourceType(ResourceType):
     """
@@ -56,11 +78,15 @@ class MetricResourceType(ResourceType):
 
     @override
     async def put(self, resource_id: IDType, data: bytes) -> None:
-        raise NotImplementedError
+        url = f"api/v2/metrics/{resource_id}/tags"
+        async with self.concurrency_semaphore:
+            await rest.patch_json(url, data)
 
     @override
     def transform_get_to_put(self, data: bytes) -> bytes:
-        return data
+        metric_tag_data = MetricTagDataModel.model_validate_json(data)
+        metric_tag = MetricTagModel(data=metric_tag_data)
+        return metric_tag.model_dump_json(exclude_none=True)
 
     async def _list_ids(self, cursor_pagination: CursorPagination) -> AsyncGenerator[IDType]:
         async for page in cursor_pagination.pages(f"api/{self.rest_path()}", self.concurrency_semaphore):
