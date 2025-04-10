@@ -6,9 +6,9 @@ import logging
 from collections.abc import AsyncGenerator
 from pathlib import Path
 from typing import override
-from pydantic import BaseModel
 
 import aiofiles
+from pydantic import BaseModel
 
 from dogcrud.core import context, rest
 from dogcrud.core.pagination import CursorDataItemModel, CursorPagination
