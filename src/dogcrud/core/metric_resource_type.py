@@ -38,6 +38,7 @@ class MetricTagDataModel(BaseModel):
 class MetricTagModel(BaseModel):
     data: MetricTagDataModel
 
+
 class MetricResourceType(ResourceType):
     """
     A Datadog metric resource. This resource doesn't fit in with a StandardResourceType since

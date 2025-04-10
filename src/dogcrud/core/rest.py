@@ -81,5 +81,21 @@ async def patch_json(path: str, body: bytes) -> None:
         t0 = time.perf_counter()
         async with async_run_context().datadog_session.patch(url, data=body, headers=headers) as resp:
             duration = time.perf_counter() - t0
-            logger.debug(f"patch_json: url={url}, body={len(body)} bytes, status={resp.status}, duration={duration:.3f}s")
+            logger.debug(
+                f"patch_json: url={url}, body={len(body)} bytes, status={resp.status}, duration={duration:.3f}s"
+            )
+            resp.raise_for_status()
+
+
+async def post_json(path: str, body: bytes) -> None:
+    url = f"https://api.datadoghq.com/{path}"
+    headers = {"content-type": "application/json"}
+
+    async with async_run_context().concurrent_requests_semaphore:
+        t0 = time.perf_counter()
+        async with async_run_context().datadog_session.post(url, data=body, headers=headers) as resp:
+            duration = time.perf_counter() - t0
+            logger.debug(
+                f"post_json: url={url}, body={len(body)} bytes, status={resp.status}, duration={duration:.3f}s"
+            )
             resp.raise_for_status()
