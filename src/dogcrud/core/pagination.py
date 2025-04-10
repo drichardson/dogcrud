@@ -163,7 +163,7 @@ class CursorLinksModel(BaseModel):
 
 
 class CursorDataItemModel(BaseModel):
-    model_config = ConfigDict(extra='allow')
+    model_config = ConfigDict(extra="allow")
 
     id: str
 
