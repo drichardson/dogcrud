@@ -54,9 +54,9 @@ class StandardResourceType(ResourceType):
         data_dir = context.config_context().data_dir
         match resource_id:
             case None:
-                return data_dir / self.rest_path()
+                return data_dir / self.rest_base_path
             case _:
-                return data_dir / f"{self.rest_path(resource_id)}.json"
+                return data_dir / f"{self.rest_base_path}/{resource_id}.json"
 
     @override
     async def get(self, resource_id: IDType) -> bytes:

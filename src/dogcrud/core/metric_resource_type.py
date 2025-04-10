@@ -11,8 +11,9 @@ import aiofiles
 from pydantic import BaseModel
 
 from dogcrud.core import context, rest
-from dogcrud.core.pagination import CursorDataItemModel, CursorPagination
+from dogcrud.core.pagination import CursorDataItemModel
 from dogcrud.core.resource_type import IDType, ResourceType
+from dogcrud.core.metrics import list_metrics
 
 logger = logging.getLogger(__name__)
 
@@ -68,9 +69,9 @@ class MetricResourceType(ResourceType):
         data_dir = context.config_context().data_dir
         match resource_id:
             case None:
-                return data_dir / self.rest_path()
+                return data_dir / self.rest_base_path
             case _:
-                return data_dir / f"{self.rest_path(resource_id)}.json"
+                return data_dir / f"{self.rest_base_path}/{resource_id}.json"
 
     @override
     async def get(self, resource_id: IDType) -> bytes:
@@ -89,21 +90,11 @@ class MetricResourceType(ResourceType):
         metric_tag = MetricTagModel(data=metric_tag_data)
         return metric_tag.model_dump_json(exclude_none=True)
 
-    async def _list_ids(self, cursor_pagination: CursorPagination) -> AsyncGenerator[IDType]:
-        async for page in cursor_pagination.pages(f"api/{self.rest_path()}", self.concurrency_semaphore):
-            for item in page.data:
-                self._id_to_item_index[item.id] = item
-                yield item.id
-
     @override
     async def list_ids(self) -> AsyncGenerator[IDType]:
-        # data[i].attributes is only set when filter[configured]=true is set,
-        # so do 2 paginations—one with false and one with true—in order to get
-        # the attributes.
-        for configured in ("false", "true"):
-            p = CursorPagination(query_params=f"filter[configured]={configured}")
-            async for id_ in self._list_ids(p):
-                yield id_
+        async for metric in list_metrics(self.concurrency_semaphore):
+            self._id_to_item_index[metric.id] = metric
+            yield metric.id
 
     @override
     async def read_local_json(self, resource_id: IDType) -> bytes:
