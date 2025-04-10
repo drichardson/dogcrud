@@ -86,8 +86,7 @@ class MetricResourceType(ResourceType):
     def transform_get_to_put(self, data: bytes) -> bytes:
         metric_tag_data = MetricTagDataModel.model_validate_json(data)
         metric_tag = MetricTagModel(data=metric_tag_data)
-        json = metric_tag.model_dump_json(exclude_none=True)
-        return json
+        return metric_tag.model_dump_json(exclude_none=True)
 
     async def _list_ids(self, cursor_pagination: CursorPagination) -> AsyncGenerator[IDType]:
         async for page in cursor_pagination.pages(f"api/{self.rest_path()}", self.concurrency_semaphore):
