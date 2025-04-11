@@ -5,15 +5,17 @@ import asyncio
 import logging
 from collections.abc import AsyncGenerator
 from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 
 import aiofiles
 from pydantic import BaseModel
 
 from dogcrud.core import context, rest
 from dogcrud.core.metrics import list_metrics
-from dogcrud.core.pagination import CursorDataItemModel
 from dogcrud.core.resource_type import IDType, ResourceType
+
+if TYPE_CHECKING:
+    from dogcrud.core.pagination import CursorDataItemModel
 
 logger = logging.getLogger(__name__)
 
