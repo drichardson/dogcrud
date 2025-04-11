@@ -11,9 +11,9 @@ import aiofiles
 from pydantic import BaseModel
 
 from dogcrud.core import context, rest
+from dogcrud.core.metrics import list_metrics
 from dogcrud.core.pagination import CursorDataItemModel
 from dogcrud.core.resource_type import IDType, ResourceType
-from dogcrud.core.metrics import list_metrics
 
 logger = logging.getLogger(__name__)
 
