@@ -3,7 +3,7 @@
 
 import asyncio
 import logging
-from collections.abc import AsyncIterator, Sequence
+from collections.abc import AsyncGenerator, AsyncIterator, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol, assert_never, override
 
@@ -16,29 +16,11 @@ from dogcrud.core.rest import get_json
 logger = logging.getLogger(__name__)
 
 
-class Page(Protocol):
-    def get_ids(self) -> Sequence[IDType]: ...
-    def get_items(self) -> Sequence[Any]: ...
-    def get_parsed_json(self) -> Any: ...
-
-
 @dataclass(frozen=True)
-class PageImpl:
+class Page:
     ids: Sequence[IDType]
     items: Sequence[Any]
     parsed_json: Any
-
-    @override
-    def get_ids(self) -> Sequence[IDType]:
-        return self.ids
-
-    @override
-    def get_items(self) -> Sequence[Any]:
-        return self.items
-
-    @override
-    def get_parsed_json(self) -> Any:
-        return self.parsed_json
 
 
 class PaginationStrategy(Protocol):
@@ -59,7 +41,7 @@ async def _get_page(url: str, items_key: str | None) -> Page:
             raise RuntimeError(msg)
 
     ids = [item["id"] for item in items]
-    return PageImpl(ids=ids, items=items, parsed_json=parsed_json)
+    return Page(ids=ids, items=items, parsed_json=parsed_json)
 
 
 @dataclass(frozen=True)
@@ -175,15 +157,14 @@ class CursorPageModel(BaseModel):
 
 
 @dataclass(frozen=True)
-class CursorPagination(PaginationStrategy):
+class CursorPagination:
     """
     A pagination strategy based on last seen page cursor.
     """
 
     query_params: str = ""
 
-    @override
-    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncIterator[CursorPageModel]:
+    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncGenerator[CursorPageModel]:
         next_url = f"{url}?{self.query_params}&page[size]=1000&page[cursor]="
         while True:
             async with concurrency_semaphore:
