@@ -90,7 +90,7 @@ class MetricResourceType(ResourceType):
     def transform_get_to_put(self, data: bytes) -> bytes:
         metric_tag_data = MetricTagDataModel.model_validate_json(data)
         metric_tag = MetricTagModel(data=metric_tag_data)
-        return metric_tag.model_dump_json(exclude_none=True)
+        return metric_tag.model_dump_json(exclude_none=True).encode()
 
     @override
     async def list_ids(self) -> AsyncGenerator[IDType]:
