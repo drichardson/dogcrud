@@ -42,7 +42,7 @@ class MetricMetadataResourceType(StandardResourceType):
             rest_base_path="v1/metrics",
             webpage_base_path="metric/summary?metric=",
             max_concurrency=max_concurrency,
-            pagination_strategy=NoPagination,
+            pagination_strategy=NoPagination(),
         )
         self.rest_base_path = "v1/metrics"
         self.concurrency_semaphore = asyncio.BoundedSemaphore(max_concurrency)
