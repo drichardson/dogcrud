@@ -1,4 +1,4 @@
 # SPDX-FileCopyrightText: 2025-present Doug Richardson <git@rekt.email>
 # SPDX-License-Identifier: MIT
 
-__version__ = "1.0.8"
+__version__ = "1.1.0"

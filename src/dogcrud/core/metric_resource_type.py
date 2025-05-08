@@ -29,6 +29,7 @@ class MetricTagAttributesModel(BaseModel):
     aggregations: list[MetricTagAggregationModel] | None = None
     exclude_tags_mode: bool | None = None
     include_percentiles: bool | None = None
+    metric_type: str | None
     tags: list[str] | None = None
 
 
