@@ -61,7 +61,7 @@ def resource_types() -> Sequence[ResourceType]:
             rest_base_path="v2/workflows",
             webpage_base_path="workflow",
             max_concurrency=100,
-            pagination_strategy=CursorPagination(),
+            pagination_strategy=NoPagination(items_key="data"),
         ),
         MetricMetadataResourceType(
             max_concurrency=100,

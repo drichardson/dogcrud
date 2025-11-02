@@ -54,6 +54,14 @@ from dogcrud.core.logging import setup_logger
     default=4096,
     help="Try to raise the ulimit if it's below this number. This tool opens lots of concurrent file handles.",
 )
+@click.option(
+    "--skip-unsupported-workflows/--no-skip-unsupported-workflows",
+    default=False,
+    help="Skip workflows that cannot be retrieved due to Datadog API limitations. "
+    "Some workflow features (Handle triggers, iterators, etc.) are not supported "
+    "by Datadog's public API. When enabled, these workflows are skipped with a "
+    "warning showing the specific API error.",
+)
 @click.pass_context
 def cli(
     ctx: click.Context,
@@ -63,6 +71,7 @@ def cli(
     max_concurrent_requests: int,
     data_dir: pathlib.Path,
     min_open_files_limit: int,
+    skip_unsupported_workflows: bool,
 ):
     """
     Utility for working with Datadog CRUD resources.
@@ -88,6 +97,7 @@ def cli(
                 dd_app_key=dd_app_key,
                 max_concurrent_requests=max_concurrent_requests,
                 data_dir=data_dir,
+                skip_unsupported_workflows=skip_unsupported_workflows,
             )
         )
     )
