@@ -36,12 +36,11 @@ def create_save_command(rt: ResourceType):
     )
     @click.argument("resource_id", type=str)
     def save_resource_command(resource_id: str):
-        skip_unsupported_workflows = config_context().skip_unsupported_workflows
         match resource_id:
             case _ if resource_id.lower() == "all":
-                coro = save_all_resources_of_type(rt, skip_unsupported_workflows)
+                coro = save_all_resources_of_type(rt)
             case _:
-                coro = save_resource(rt, resource_id, skip_unsupported_workflows)
+                coro = save_resource(rt, resource_id)
         config_context().run_in_context(coro)
 
 
@@ -61,17 +60,16 @@ def save_all() -> None:
     """
     Save all datadog resources.
     """
-    skip_unsupported_workflows = config_context().skip_unsupported_workflows
-    config_context().run_in_context(save_all_resources(skip_unsupported_workflows))
+    config_context().run_in_context(save_all_resources())
 
 
-async def save_all_resources(skip_unsupported_workflows: bool = False):
+async def save_all_resources():
     async with asyncio.TaskGroup() as tg:
         for resource_type in resource_types():
-            tg.create_task(save_all_resources_of_type(resource_type, skip_unsupported_workflows))
+            tg.create_task(save_all_resources_of_type(resource_type))
 
 
-async def save_all_resources_of_type(resource_type: ResourceType, skip_unsupported: bool = False) -> None:
+async def save_all_resources_of_type(resource_type: ResourceType) -> None:
     prefix = f"save all {resource_type.rest_path()}"
     logger.info(f"{prefix}: Starting")
 
@@ -79,13 +77,13 @@ async def save_all_resources_of_type(resource_type: ResourceType, skip_unsupport
 
     async with asyncio.TaskGroup() as tg:
         async for resource_id in resource_type.list_ids():
-            tg.create_task(save_resource(resource_type, str(resource_id), skip_unsupported))
+            tg.create_task(save_resource(resource_type, str(resource_id)))
             num_saved += 1
 
     logger.info(f"{prefix} Saved {num_saved} items.")
 
 
-async def save_resource(resource_type: ResourceType, resource_id: str, skip_unsupported: bool = False) -> None:
+async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
     try:
         json = await resource_type.get(resource_id)
         resource_type.local_path().mkdir(exist_ok=True, parents=True)
@@ -94,6 +92,7 @@ async def save_resource(resource_type: ResourceType, resource_id: str, skip_unsu
         logger.info(f"Saved {filename}")
     except DatadogAPIBadRequestError as e:
         # Some workflow features aren't supported by Datadog's public API
+        skip_unsupported = config_context().skip_unsupported_workflows
         if skip_unsupported and "workflows" in resource_type.rest_path():
             try:
                 error_data = orjson.loads(e.error_body)
