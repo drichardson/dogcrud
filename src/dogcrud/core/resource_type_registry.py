@@ -7,7 +7,6 @@ from functools import partial
 from dogcrud.core.metric_metadata_resource_type import MetricMetadataResourceType
 from dogcrud.core.metric_resource_type import MetricResourceType
 from dogcrud.core.pagination import (
-    CursorPagination,
     IDOffsetPagination,
     ItemOffsetPagination,
     NoPagination,

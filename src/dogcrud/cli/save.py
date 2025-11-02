@@ -103,6 +103,6 @@ async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
             logger.warning(f"Skipping {resource_type.rest_path()}/{resource_id}: {error_detail}")
         else:
             raise
-    except aiohttp.client_exceptions.ClientResponseError as e:
+    except aiohttp.client_exceptions.ClientResponseError:
         # Re-raise other HTTP errors
         raise
