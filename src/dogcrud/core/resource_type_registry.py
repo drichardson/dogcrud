@@ -7,6 +7,7 @@ from functools import partial
 from dogcrud.core.metric_metadata_resource_type import MetricMetadataResourceType
 from dogcrud.core.metric_resource_type import MetricResourceType
 from dogcrud.core.pagination import (
+    CursorPagination,
     IDOffsetPagination,
     ItemOffsetPagination,
     NoPagination,
@@ -55,6 +56,12 @@ def resource_types() -> Sequence[ResourceType]:
             webpage_base_path="logs/pipelines/generate-metrics",
             max_concurrency=100,
             pagination_strategy=NoPagination(items_key="data"),
+        ),
+        StandardResourceType(
+            rest_base_path="v2/workflows",
+            webpage_base_path="workflow",
+            max_concurrency=100,
+            pagination_strategy=CursorPagination(),
         ),
         MetricMetadataResourceType(
             max_concurrency=100,
