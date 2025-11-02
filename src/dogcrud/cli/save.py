@@ -93,7 +93,7 @@ async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
     except DatadogAPIBadRequestError as e:
         # Some workflow features aren't supported by Datadog's public API
         skip_unsupported = config_context().skip_unsupported_workflows
-        if skip_unsupported and "workflows" in resource_type.rest_path():
+        if skip_unsupported and resource_type.rest_path() == "v2/workflows":
             try:
                 error_data = orjson.loads(e.error_body)
                 error_detail = error_data.get("errors", [{}])[0].get("detail", "Unknown error")
