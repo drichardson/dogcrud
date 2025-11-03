@@ -71,7 +71,7 @@ def cli(
     max_concurrent_requests: int,
     data_dir: pathlib.Path,
     min_open_files_limit: int,
-    skip_unsupported_workflows: bool,
+    skip_unsupported_workflows: bool,  # noqa: FBT001
 ):
     """
     Utility for working with Datadog CRUD resources.
