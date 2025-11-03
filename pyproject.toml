@@ -7,7 +7,7 @@ name = "dogcrud"
 dynamic = ["version"]
 description = "Datadog CRUD resources from the command line."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.14"
 dependencies = [
 	"aiofiles~=24.1.0",
 	"aiohttp[speedups]~=3.11.11",
@@ -40,6 +40,9 @@ dogcrud = "dogcrud.cli.main:cli"
 
 [tool.hatch.version]
 path = "src/dogcrud/__about__.py"
+
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.12", "3.13"]
 
 [tool.hatch.envs.types]
 extra-dependencies = [

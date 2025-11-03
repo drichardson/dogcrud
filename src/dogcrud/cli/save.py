@@ -4,12 +4,15 @@
 import asyncio
 import logging
 
+import aiohttp.client_exceptions
 import click
+import orjson
 
 from dogcrud.core import data
 from dogcrud.core.context import config_context
 from dogcrud.core.resource_type import ResourceType
 from dogcrud.core.resource_type_registry import resource_types
+from dogcrud.core.rest import DatadogAPIBadRequestError
 
 logger = logging.getLogger(__name__)
 
@@ -81,8 +84,21 @@ async def save_all_resources_of_type(resource_type: ResourceType) -> None:
 
 
 async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
-    json = await resource_type.get(resource_id)
-    resource_type.local_path().mkdir(exist_ok=True, parents=True)
-    filename = resource_type.local_path(resource_id)
-    await data.write_formatted_json(json, str(filename))
-    logger.info(f"Saved {filename}")
+    try:
+        json = await resource_type.get(resource_id)
+        resource_type.local_path().mkdir(exist_ok=True, parents=True)
+        filename = resource_type.local_path(resource_id)
+        await data.write_formatted_json(json, str(filename))
+        logger.info(f"Saved {filename}")
+    except DatadogAPIBadRequestError as e:
+        # Some workflow features aren't supported by Datadog's public API
+        skip_unsupported = config_context().skip_unsupported_workflows
+        if skip_unsupported and resource_type.rest_path() == "v2/workflows":
+            error_data = orjson.loads(e.error_body)
+            error_detail = error_data.get("errors", [{}])[0].get("detail", "Unknown error")
+            logger.warning(f"Skipping {resource_type.rest_path()}/{resource_id}: {error_detail}")
+        else:
+            raise
+    except aiohttp.client_exceptions.ClientResponseError:
+        # Re-raise other HTTP errors
+        raise

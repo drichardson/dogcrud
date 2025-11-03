@@ -32,6 +32,7 @@ class ConfigContext:
     dd_app_key: str
     max_concurrent_requests: int
     data_dir: pathlib.Path
+    skip_unsupported_workflows: bool = False
 
     def run_in_context(self, main: Coroutine) -> None:
         asyncio.run(self.in_context(main))

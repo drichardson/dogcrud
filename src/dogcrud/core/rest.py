@@ -5,9 +5,19 @@ import asyncio
 import logging
 import time
 
+import aiohttp.client_exceptions
+
 from dogcrud.core.context import async_run_context
 
 logger = logging.getLogger(__name__)
+
+
+class DatadogAPIBadRequestError(aiohttp.client_exceptions.ClientResponseError):
+    """400 Bad Request error from Datadog API with error body preserved."""
+
+    def __init__(self, request_info, history, status: int, message: str, headers, error_body: str):
+        super().__init__(request_info, history, status=status, message=message, headers=headers)
+        self.error_body = error_body
 
 
 async def get_json(path: str) -> bytes:
@@ -48,6 +58,17 @@ async def get_json(path: str) -> bytes:
                     case 429:
                         # https://docs.datadoghq.com/api/latest/rate-limits/
                         ratelimit_reset = float(resp.headers["X-RateLimit-Reset"])
+                    case 400:
+                        # Read error body before raising so we can include it in the exception
+                        error_body = await resp.text()
+                        raise DatadogAPIBadRequestError(
+                            request_info=resp.request_info,
+                            history=resp.history,
+                            status=resp.status,
+                            message=resp.reason or "Bad Request",
+                            headers=resp.headers,
+                            error_body=error_body,
+                        )
                     case _:
                         resp.raise_for_status()
                         # above will raise for most HTTP error, but if we get
