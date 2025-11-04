@@ -9,7 +9,6 @@ from dogcrud.core.metric_resource_type import MetricResourceType
 from dogcrud.core.pagination import (
     IDOffsetPagination,
     ItemOffsetPagination,
-    LimitOffsetPagination,
     NoPagination,
 )
 from dogcrud.core.reference_table_resource_type import ReferenceTableResourceType
