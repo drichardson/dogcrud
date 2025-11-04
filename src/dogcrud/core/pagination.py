@@ -6,6 +6,7 @@ import logging
 from collections.abc import AsyncGenerator, AsyncIterator, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol, assert_never, override
+from urllib.parse import urlencode
 
 import orjson
 from pydantic import BaseModel, ConfigDict
@@ -64,6 +65,49 @@ class ItemOffsetPagination(PaginationStrategy):
         while True:
             async with concurrency_semaphore:
                 page = await _get_page(f"{url}?{self.offset_query_param}={offset}", self.items_key)
+            if not page.ids:
+                return
+            yield page
+            offset += len(page.ids)
+            new_ids = set(page.ids)
+            if already_seen_ids := new_ids & seen_ids:
+                logger.warning(
+                    f"Duplicate IDs seen while paging. If transient okay to ignore cause it might be someone else mutating the list of items. already_seen_ids={already_seen_ids}. If not transient, this could be a misconfiguration of the pagination_strategy."
+                )
+            seen_ids |= new_ids
+
+
+@dataclass(frozen=True)
+class LimitOffsetPagination(PaginationStrategy):
+    """
+    A pagination strategy based on limit and offset query parameters.
+
+    Attributes:
+        limit: The number of items to fetch per page.
+        limit_query_param: The name of the query parameter for the limit.
+        offset_query_param: The name of the query parameter for the offset.
+        items_key: If the page response is an object, this is the key to the list of items. Use None if the response is already a list.
+    """
+
+    limit: int = 100
+    limit_query_param: str = "limit"
+    offset_query_param: str = "offset"
+    items_key: str | None = None
+
+    @override
+    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncIterator[Page]:
+        offset = 0
+        seen_ids: set[IDType] = set()
+        while True:
+            async with concurrency_semaphore:
+                query_params = {
+                    self.limit_query_param: self.limit,
+                    self.offset_query_param: offset,
+                }
+                page = await _get_page(
+                    f"{url}?{urlencode(query_params)}",
+                    self.items_key,
+                )
             if not page.ids:
                 return
             yield page

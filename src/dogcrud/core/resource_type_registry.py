@@ -11,6 +11,7 @@ from dogcrud.core.pagination import (
     ItemOffsetPagination,
     NoPagination,
 )
+from dogcrud.core.reference_table_resource_type import ReferenceTableResourceType
 from dogcrud.core.resource_type import ResourceType
 from dogcrud.core.standard_resource_type import StandardResourceType
 from dogcrud.core.transformers import data_at_key
@@ -61,6 +62,9 @@ def resource_types() -> Sequence[ResourceType]:
             webpage_base_path="workflow",
             max_concurrency=100,
             pagination_strategy=NoPagination(items_key="data"),
+        ),
+        ReferenceTableResourceType(
+            max_concurrency=100,
         ),
         MetricMetadataResourceType(
             max_concurrency=100,
