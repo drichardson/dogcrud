@@ -6,6 +6,7 @@ import logging
 from collections.abc import AsyncGenerator, AsyncIterator, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol, assert_never, override
+from urllib.parse import urlencode
 
 import orjson
 from pydantic import BaseModel, ConfigDict
@@ -77,71 +78,6 @@ class ItemOffsetPagination(PaginationStrategy):
 
 
 @dataclass(frozen=True)
-class MetaOffsetPagination(PaginationStrategy):
-    """
-    A pagination strategy that uses meta.page.next_offset from the API response.
-
-    This strategy expects the API to return a response like:
-    {
-        "data": [...],
-        "meta": {
-            "page": {
-                "next_offset": 15  // or null when no more pages
-            }
-        }
-    }
-
-    Attributes:
-        limit: The number of items to fetch per page.
-        limit_query_param: The name of the query parameter for the limit.
-        offset_query_param: The name of the query parameter for the offset.
-        items_key: The key to the list of items in the response.
-    """
-
-    limit: int = 100
-    limit_query_param: str = "limit"
-    offset_query_param: str = "offset"
-    items_key: str = "data"
-
-    @override
-    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncIterator[Page]:
-        offset: int | None = 0
-        seen_ids: set[IDType] = set()
-
-        while offset is not None:
-            async with concurrency_semaphore:
-                page_url = f"{url}?{self.limit_query_param}={self.limit}&{self.offset_query_param}={offset}"
-                json_bytes = await get_json(page_url)
-                parsed_json = orjson.loads(json_bytes)
-
-                items = parsed_json[self.items_key]
-                ids = [item["id"] for item in items]
-                page = Page(ids=ids, items=items, parsed_json=parsed_json)
-
-            if not page.ids:
-                return
-
-            # Check if we've seen all these IDs before - if so, stop
-            new_ids = set(page.ids)
-            if new_ids.issubset(seen_ids):
-                # All IDs in this page have been seen before, stop pagination
-                return
-
-            yield page
-
-            seen_ids |= new_ids
-
-            # Get next_offset from meta.page.next_offset
-            next_offset = parsed_json.get("meta", {}).get("page", {}).get("next_offset")
-
-            # Stop if next_offset hasn't changed (API bug) or is None
-            if next_offset is None or next_offset == offset:
-                return
-
-            offset = next_offset
-
-
-@dataclass(frozen=True)
 class LimitOffsetPagination(PaginationStrategy):
     """
     A pagination strategy based on limit and offset query parameters.
@@ -164,8 +100,12 @@ class LimitOffsetPagination(PaginationStrategy):
         seen_ids: set[IDType] = set()
         while True:
             async with concurrency_semaphore:
+                query_params = {
+                    self.limit_query_param: self.limit,
+                    self.offset_query_param: offset,
+                }
                 page = await _get_page(
-                    f"{url}?{self.limit_query_param}={self.limit}&{self.offset_query_param}={offset}",
+                    f"{url}?{urlencode(query_params)}",
                     self.items_key,
                 )
             if not page.ids:

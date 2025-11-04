@@ -10,7 +10,6 @@ from dogcrud.core.pagination import (
     IDOffsetPagination,
     ItemOffsetPagination,
     LimitOffsetPagination,
-    MetaOffsetPagination,
     NoPagination,
 )
 from dogcrud.core.resource_type import ResourceType
@@ -68,7 +67,12 @@ def resource_types() -> Sequence[ResourceType]:
             rest_base_path="v2/reference-tables/tables",
             webpage_base_path="reference-tables",
             max_concurrency=100,
-            pagination_strategy=MetaOffsetPagination(limit=100, items_key="data"),
+            pagination_strategy=LimitOffsetPagination(
+                limit=100,
+                limit_query_param="page[limit]",
+                offset_query_param="page[offset]",
+                items_key="data",
+            ),
         ),
         MetricMetadataResourceType(
             max_concurrency=100,

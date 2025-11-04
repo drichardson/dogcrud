@@ -1,4 +1,28 @@
-# Reference Tables API Pagination Bug Report
+# Reference Tables API Pagination Documentation Bug Report
+
+## Resolution
+
+**RESOLVED**: Datadog support confirmed this was a documentation bug, not an API bug. The correct pagination parameters are:
+- `page[limit]` instead of `limit`
+- `page[offset]` instead of `offset`
+
+Example working request:
+```bash
+curl "https://api.datadoghq.com/api/v2/reference-tables/tables?page[limit]=5&page[offset]=0" \
+  -H "DD-API-KEY: YOUR_API_KEY" \
+  -H "DD-APPLICATION-KEY: YOUR_APP_KEY"
+```
+
+Or with URL encoding:
+```bash
+curl "https://api.datadoghq.com/api/v2/reference-tables/tables?page%5Blimit%5D=5&page%5Boffset%5D=0" \
+  -H "DD-API-KEY: YOUR_API_KEY" \
+  -H "DD-APPLICATION-KEY: YOUR_APP_KEY"
+```
+
+---
+
+## Original Bug Report
 
 ## Summary
 
