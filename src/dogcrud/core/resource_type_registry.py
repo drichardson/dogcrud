@@ -62,6 +62,7 @@ def resource_types() -> Sequence[ResourceType]:
             webpage_base_path="workflow",
             max_concurrency=100,
             pagination_strategy=NoPagination(items_key="data"),
+            disabled=True,
         ),
         ReferenceTableResourceType(
             max_concurrency=100,

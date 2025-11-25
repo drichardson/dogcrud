@@ -33,6 +33,8 @@ class StandardResourceType(ResourceType):
         pagination_strategy: PaginationStrategy,
         webpage_suffix: str = "",
         get_to_put_transformer: transformers.GetToPut = transformers.identity,
+        *,
+        disabled: bool = False,
     ) -> None:
         self.rest_base_path = rest_base_path
         self.webpage_base_path = webpage_base_path
@@ -40,6 +42,7 @@ class StandardResourceType(ResourceType):
         self.pagination_strategy = pagination_strategy
         self.webpage_suffix = webpage_suffix
         self.get_to_put_transformer = get_to_put_transformer
+        self.disabled = disabled
 
     @override
     def rest_path(self, resource_id: IDType | None = None) -> str:
