@@ -54,6 +54,8 @@ for rt in resource_types():
 Save all datadog resources supported by this tool.
 
 Includes: {", ".join(rt.rest_path() for rt in resource_types())}
+
+Note: Disabled resource types are excluded by default. Use --include-disabled to include them.
 """,
 )
 def save_all() -> None:
@@ -64,8 +66,11 @@ def save_all() -> None:
 
 
 async def save_all_resources():
+    include_disabled = config_context().include_disabled
     async with asyncio.TaskGroup() as tg:
         for resource_type in resource_types():
+            if resource_type.disabled and not include_disabled:
+                continue
             tg.create_task(save_all_resources_of_type(resource_type))
 
 

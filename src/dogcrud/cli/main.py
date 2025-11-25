@@ -62,6 +62,12 @@ from dogcrud.core.logging import setup_logger
     "by Datadog's public API. When enabled, these workflows are skipped with a "
     "warning showing the specific API error.",
 )
+@click.option(
+    "--include-disabled/--no-include-disabled",
+    default=False,
+    help="Include disabled resource types in 'save all' operations. "
+    "Disabled resource types can still be saved individually.",
+)
 @click.pass_context
 def cli(
     ctx: click.Context,
@@ -72,6 +78,7 @@ def cli(
     data_dir: pathlib.Path,
     min_open_files_limit: int,
     skip_unsupported_workflows: bool,  # noqa: FBT001
+    include_disabled: bool,  # noqa: FBT001
 ):
     """
     Utility for working with Datadog CRUD resources.
@@ -98,6 +105,7 @@ def cli(
                 max_concurrent_requests=max_concurrent_requests,
                 data_dir=data_dir,
                 skip_unsupported_workflows=skip_unsupported_workflows,
+                include_disabled=include_disabled,
             )
         )
     )

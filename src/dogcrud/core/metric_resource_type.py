@@ -54,10 +54,13 @@ class MetricResourceType(ResourceType):
     def __init__(
         self,
         max_concurrency: int,
+        *,
+        disabled: bool = False,
     ) -> None:
         self.rest_base_path = "v2/metrics"
         self.concurrency_semaphore = asyncio.BoundedSemaphore(max_concurrency)
         self._id_to_item_index: dict[IDType, CursorDataItemModel] = {}
+        self.disabled = disabled
 
     @override
     def rest_path(self, resource_id: IDType | None = None) -> str:
