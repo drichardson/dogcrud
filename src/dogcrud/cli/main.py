@@ -7,6 +7,7 @@ import resource
 
 import click
 
+from dogcrud.cli.list import list_resources
 from dogcrud.cli.open import open_in_browser
 from dogcrud.cli.restore import restore
 from dogcrud.cli.save import save
@@ -114,5 +115,6 @@ def cli(
 cli.add_command(save)
 cli.add_command(restore)
 cli.add_command(open_in_browser)
+cli.add_command(list_resources)
 
 cli.main()
