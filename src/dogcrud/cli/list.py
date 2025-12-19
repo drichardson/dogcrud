@@ -8,8 +8,11 @@ import click
 import orjson
 
 from dogcrud.core.context import config_context
+from dogcrud.core.metric_metadata_resource_type import MetricMetadataResourceType
+from dogcrud.core.metric_resource_type import MetricResourceType
 from dogcrud.core.resource_type import ResourceType
 from dogcrud.core.resource_type_registry import resource_types
+from dogcrud.core.standard_resource_type import StandardResourceType
 
 logger = logging.getLogger(__name__)
 
@@ -83,27 +86,26 @@ async def list_all_resources_of_type(resource_type: ResourceType, output_format:
 
     items = []
 
-    # Try to use pagination_strategy to get full items with details
-    if hasattr(resource_type, "pagination_strategy"):
-        try:
+    # Match specific resource types - order matters!
+    match resource_type:
+        case MetricMetadataResourceType() | MetricResourceType():
+            # Metric types override list_ids and don't support standard pagination
+            items = [{"id": resource_id} async for resource_id in resource_type.list_ids()]
+        case StandardResourceType():
+            # StandardResourceType has pagination_strategy which provides richer item details
             async for page in resource_type.pagination_strategy.pages(
                 f"api/{resource_type.rest_path()}", resource_type.concurrency_semaphore
             ):
                 items.extend(page.items)
-        except Exception as e:
-            # Fall back to list_ids if pagination fails
-            logger.debug(f"{prefix}: Pagination failed ({e}), falling back to list_ids()")
-            async for resource_id in resource_type.list_ids():
-                items.append({"id": resource_id})
-    else:
-        # For non-standard types (like MetricResourceType), just list IDs
-        async for resource_id in resource_type.list_ids():
-            items.append({"id": resource_id})
+        case _:
+            # Fallback for any other resource types
+            items = [{"id": resource_id} async for resource_id in resource_type.list_ids()]
 
-    if output_format == "json":
-        output_json(resource_type, items)
-    else:
-        output_table(resource_type, items)
+    match output_format:
+        case "json":
+            output_json(resource_type, items)
+        case _:
+            output_table(resource_type, items)
 
     logger.debug(f"{prefix}: Listed {len(items)} items.")
 
@@ -115,12 +117,12 @@ def output_json(resource_type: ResourceType, items: list) -> None:
         "items": items,
         "count": len(items),
     }
-    print(orjson.dumps(output, option=orjson.OPT_INDENT_2).decode())
+    click.echo(orjson.dumps(output, option=orjson.OPT_INDENT_2).decode())
 
 
 def output_table(resource_type: ResourceType, items: list) -> None:
     """Output items as a simple text list."""
-    print(f"{resource_type.rest_path()} ({len(items)} resources)")
+    click.echo(f"{resource_type.rest_path()} ({len(items)} resources)")
     for item in items:
         item_id = item.get("id", "N/A")
         # Try to find a human-readable name/title field
@@ -132,6 +134,6 @@ def output_table(resource_type: ResourceType, items: list) -> None:
         )
 
         if name:
-            print(f"{item_id} {name}")
+            click.echo(f"{item_id} {name}")
         else:
-            print(f"{item_id}")
+            click.echo(f"{item_id}")
