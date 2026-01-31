@@ -81,7 +81,7 @@ async def get_json(path: str) -> bytes:
                         if retries_5xx > max_retries_5xx:
                             resp.raise_for_status()
                         sleep_seconds = 2 ** (retries_5xx - 1)  # 1, 2, 4, 8, 16 seconds
-                        logger.info(
+                        logger.warning(
                             f"Server error ({status}), retry {retries_5xx}/{max_retries_5xx}, sleeping {sleep_seconds} seconds for {url}"
                         )
                     case _:
