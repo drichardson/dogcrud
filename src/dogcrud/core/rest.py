@@ -38,14 +38,19 @@ async def get_json(path: str) -> bytes:
     for X-RateLimit-Reset (a datadog response header) seconds before trying
     again.
 
+    If the request fails with an HTTP 5xx error, this function will retry up to
+    5 times with exponential backoff.
+
     Documentation for Datadog APIs can be found at
     https://docs.datadoghq.com/api/latest/.
     """
     url = path if path.startswith("https://") else f"https://api.datadoghq.com/{path}"
     headers = {"accept": "application/json"}
-    ratelimit_reset = 0.0
+    sleep_seconds = 0.0
 
     retry = 0
+    retries_5xx = 0
+    max_retries_5xx = 5
     while True:
         async with async_run_context().concurrent_requests_semaphore:
             t0 = time.perf_counter()
@@ -55,9 +60,6 @@ async def get_json(path: str) -> bytes:
                 match resp.status:
                     case 200:
                         return await resp.read()
-                    case 429:
-                        # https://docs.datadoghq.com/api/latest/rate-limits/
-                        ratelimit_reset = float(resp.headers["X-RateLimit-Reset"])
                     case 400:
                         # Read error body before raising so we can include it in the exception
                         error_body = await resp.text()
@@ -69,6 +71,19 @@ async def get_json(path: str) -> bytes:
                             headers=resp.headers,
                             error_body=error_body,
                         )
+                    case 429:
+                        # https://docs.datadoghq.com/api/latest/rate-limits/
+                        sleep_seconds = float(resp.headers["X-RateLimit-Reset"])
+                        logger.info(f"Rate limited, sleeping {sleep_seconds} seconds for {url}")
+                    case status if status >= 500:  # noqa: PLR2004
+                        # Datadog started returning 500s pretty regularly in January 2026
+                        retries_5xx += 1
+                        if retries_5xx > max_retries_5xx:
+                            resp.raise_for_status()
+                        sleep_seconds = 2 ** (retries_5xx - 1)  # 1, 2, 4, 8, 16 seconds
+                        logger.warning(
+                            f"Server error ({status}), retry {retries_5xx}/{max_retries_5xx}, sleeping {sleep_seconds} seconds for {url}"
+                        )
                     case _:
                         resp.raise_for_status()
                         # above will raise for most HTTP error, but if we get
@@ -77,8 +92,7 @@ async def get_json(path: str) -> bytes:
                         msg = "Unexpected status code {resp.status} for {url}"
                         raise RuntimeError(msg)
 
-        logger.info(f"Sleeping until rate limit reset in {ratelimit_reset} seconds for {url}")
-        await asyncio.sleep(float(ratelimit_reset))
+        await asyncio.sleep(sleep_seconds)
         retry += 1
 
 
