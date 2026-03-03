@@ -91,8 +91,8 @@ async def save_all_resources_of_type(resource_type: ResourceType) -> None:
 async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
     try:
         json = await resource_type.get(resource_id)
-        resource_type.local_path().mkdir(exist_ok=True, parents=True)
         filename = resource_type.local_path(resource_id)
+        filename.parent.mkdir(exist_ok=True, parents=True)
         await data.write_formatted_json(json, str(filename))
         logger.info(f"Saved {filename}")
     except DatadogAPIBadRequestError as e:

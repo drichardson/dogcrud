@@ -13,6 +13,7 @@ from dogcrud.core.pagination import (
 )
 from dogcrud.core.reference_table_resource_type import ReferenceTableResourceType
 from dogcrud.core.resource_type import ResourceType
+from dogcrud.core.slack_channel_resource_type import SlackChannelResourceType
 from dogcrud.core.standard_resource_type import StandardResourceType
 from dogcrud.core.transformers import data_at_key
 
@@ -71,6 +72,9 @@ def resource_types() -> Sequence[ResourceType]:
             max_concurrency=100,
         ),
         MetricResourceType(
+            max_concurrency=100,
+        ),
+        SlackChannelResourceType(
             max_concurrency=100,
         ),
     )
