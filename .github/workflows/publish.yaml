@@ -5,6 +5,8 @@ on:
   release:
     types: [published]
 
+# id-token: write is required for PyPI trusted publishing (OIDC).
+# See https://docs.pypi.org/trusted-publishers/ for details.
 permissions:
   contents: read
   id-token: write
