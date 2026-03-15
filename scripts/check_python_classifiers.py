@@ -21,7 +21,7 @@ with open(root / "pyproject.toml", "rb") as f:
 classifier_versions = {
     c.removeprefix("Programming Language :: Python :: ")
     for c in data["project"]["classifiers"]
-    if re.fullmatch(r"Programming Language :: Python :: 3\.\d+", c)
+    if re.fullmatch(r"Programming Language :: Python :: \d+\.\d+", c)
 }
 
 ci = (root / ".github/workflows/ci.yaml").read_text()
@@ -31,7 +31,7 @@ if not match:
     print("ERROR: could not find python-version matrix in ci.yaml")
     sys.exit(1)
 
-matrix_versions = set(re.findall(r'"(3\.\d+)"', match.group(1)))
+matrix_versions = set(re.findall(r'"(\d+\.\d+)"', match.group(1)))
 
 if classifier_versions != matrix_versions:
     print("MISMATCH")
