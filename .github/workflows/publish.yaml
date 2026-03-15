@@ -5,13 +5,16 @@ on:
   release:
     types: [published]
 
+# id-token: write is required for PyPI trusted publishing (OIDC).
+# See https://docs.pypi.org/trusted-publishers/ for details.
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: production
+    environment: publishing
 
     steps:
     - uses: actions/checkout@v4
@@ -24,5 +27,3 @@ jobs:
 
     - name: Upload distributions.
       run: uv publish
-      env:
-        UV_PUBLISH_TOKEN: ${{ secrets.HATCH_INDEX_AUTH }}
