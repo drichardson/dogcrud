@@ -80,7 +80,9 @@ async def list_all_resource_types(output_format: str):
             tg.create_task(list_all_resources_of_type(resource_type, output_format))
 
 
-async def list_all_resources_of_type(resource_type: ResourceType, output_format: str) -> None:
+async def list_all_resources_of_type(
+    resource_type: ResourceType, output_format: str
+) -> None:
     prefix = f"list all {resource_type.rest_path()}"
     logger.debug(f"{prefix}: Starting")
 
@@ -90,7 +92,9 @@ async def list_all_resources_of_type(resource_type: ResourceType, output_format:
     match resource_type:
         case MetricMetadataResourceType() | MetricResourceType():
             # Metric types override list_ids and don't support standard pagination
-            items = [{"id": resource_id} async for resource_id in resource_type.list_ids()]
+            items = [
+                {"id": resource_id} async for resource_id in resource_type.list_ids()
+            ]
         case StandardResourceType():
             # StandardResourceType has pagination_strategy which provides richer item details
             async for page in resource_type.pagination_strategy.pages(
@@ -99,7 +103,9 @@ async def list_all_resources_of_type(resource_type: ResourceType, output_format:
                 items.extend(page.items)
         case _:
             # Fallback for any other resource types
-            items = [{"id": resource_id} async for resource_id in resource_type.list_ids()]
+            items = [
+                {"id": resource_id} async for resource_id in resource_type.list_ids()
+            ]
 
     match output_format:
         case "json":

@@ -30,7 +30,9 @@ def resource_types() -> Sequence[ResourceType]:
             rest_base_path="v1/dashboard",
             webpage_base_path="dashboard",
             max_concurrency=20,
-            pagination_strategy=ItemOffsetPagination(offset_query_param="start", items_key="dashboards"),
+            pagination_strategy=ItemOffsetPagination(
+                offset_query_param="start", items_key="dashboards"
+            ),
         ),
         StandardResourceType(
             rest_base_path="v1/monitor",
@@ -48,7 +50,9 @@ def resource_types() -> Sequence[ResourceType]:
             rest_base_path="v1/slo",
             webpage_base_path="slo",
             max_concurrency=100,
-            pagination_strategy=ItemOffsetPagination(offset_query_param="offset", items_key="data"),
+            pagination_strategy=ItemOffsetPagination(
+                offset_query_param="offset", items_key="data"
+            ),
             webpage_suffix="/edit",
             get_to_put_transformer=partial(data_at_key, "data"),
         ),

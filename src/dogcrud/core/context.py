@@ -53,7 +53,9 @@ class ConfigContext:
             token = async_run_context_var.set(
                 AsyncRunContext(
                     datadog_session=datadog_session,
-                    concurrent_requests_semaphore=asyncio.BoundedSemaphore(self.max_concurrent_requests),
+                    concurrent_requests_semaphore=asyncio.BoundedSemaphore(
+                        self.max_concurrent_requests
+                    ),
                 )
             )
             try:

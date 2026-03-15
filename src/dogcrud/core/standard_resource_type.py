@@ -77,7 +77,9 @@ class StandardResourceType(ResourceType):
 
     @override
     async def list_ids(self) -> AsyncGenerator[IDType]:
-        async for page in self.pagination_strategy.pages(f"api/{self.rest_path()}", self.concurrency_semaphore):
+        async for page in self.pagination_strategy.pages(
+            f"api/{self.rest_path()}", self.concurrency_semaphore
+        ):
             for id_ in page.ids:
                 yield id_
 

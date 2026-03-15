@@ -16,7 +16,10 @@ def format_json(json: bytes) -> bytes:
     Pretty print JSON with sorted keys so that JSON files are easier to diff.
     """
     parsed_json = orjson.loads(json)
-    return orjson.dumps(parsed_json, option=orjson.OPT_INDENT_2 | orjson.OPT_SORT_KEYS | orjson.OPT_APPEND_NEWLINE)
+    return orjson.dumps(
+        parsed_json,
+        option=orjson.OPT_INDENT_2 | orjson.OPT_SORT_KEYS | orjson.OPT_APPEND_NEWLINE,
+    )
 
 
 async def write_formatted_json(json: bytes, filename: str) -> None:

@@ -25,7 +25,9 @@ class Page:
 
 
 class PaginationStrategy(Protocol):
-    def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncIterator[Page]: ...
+    def pages(
+        self, url: str, concurrency_semaphore: asyncio.Semaphore
+    ) -> AsyncIterator[Page]: ...
 
 
 async def _get_page(url: str, items_key: str | None) -> Page:
@@ -59,12 +61,16 @@ class ItemOffsetPagination(PaginationStrategy):
     items_key: str | None = None
 
     @override
-    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncIterator[Page]:
+    async def pages(
+        self, url: str, concurrency_semaphore: asyncio.Semaphore
+    ) -> AsyncIterator[Page]:
         offset = 0
         seen_ids: set[IDType] = set()
         while True:
             async with concurrency_semaphore:
-                page = await _get_page(f"{url}?{self.offset_query_param}={offset}", self.items_key)
+                page = await _get_page(
+                    f"{url}?{self.offset_query_param}={offset}", self.items_key
+                )
             if not page.ids:
                 return
             yield page
@@ -95,7 +101,9 @@ class LimitOffsetPagination(PaginationStrategy):
     items_key: str | None = None
 
     @override
-    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncIterator[Page]:
+    async def pages(
+        self, url: str, concurrency_semaphore: asyncio.Semaphore
+    ) -> AsyncIterator[Page]:
         offset = 0
         seen_ids: set[IDType] = set()
         while True:
@@ -134,13 +142,17 @@ class IDOffsetPagination(PaginationStrategy):
     items_key: str | None = None
 
     @override
-    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncIterator[Page]:
+    async def pages(
+        self, url: str, concurrency_semaphore: asyncio.Semaphore
+    ) -> AsyncIterator[Page]:
         id_offset: IDType = "0"
         offset = 0
         seen_ids: set[IDType] = set()
         while True:
             async with concurrency_semaphore:
-                page = await _get_page(f"{url}?{self.offset_query_param}={id_offset}", self.items_key)
+                page = await _get_page(
+                    f"{url}?{self.offset_query_param}={id_offset}", self.items_key
+                )
             if not page.ids:
                 return
             yield page
@@ -166,7 +178,9 @@ class NoPagination(PaginationStrategy):
     items_key: str | None = None
 
     @override
-    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncIterator[Page]:
+    async def pages(
+        self, url: str, concurrency_semaphore: asyncio.Semaphore
+    ) -> AsyncIterator[Page]:
         async with concurrency_semaphore:
             page = await _get_page(url, self.items_key)
         yield page
@@ -208,7 +222,9 @@ class CursorPagination:
 
     query_params: str = ""
 
-    async def pages(self, url: str, concurrency_semaphore: asyncio.Semaphore) -> AsyncGenerator[CursorPageModel]:
+    async def pages(
+        self, url: str, concurrency_semaphore: asyncio.Semaphore
+    ) -> AsyncGenerator[CursorPageModel]:
         next_url = f"{url}?{self.query_params}&page[size]=1000&page[cursor]="
         while True:
             async with concurrency_semaphore:
