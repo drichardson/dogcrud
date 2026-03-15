@@ -46,6 +46,37 @@ jobs:
     - name: Check Types
       run: uv run mypy src/dogcrud tests
 
+    - name: Check Python classifiers match CI matrix
+      run: uv run --script scripts/check_python_classifiers.py
+
+    - name: Check Python classifiers match CI matrix
+      run: |
+        python3 - <<'EOF'
+        import tomllib, re, sys
+
+        with open("pyproject.toml", "rb") as f:
+            data = tomllib.load(f)
+
+        classifier_versions = {
+            c.removeprefix("Programming Language :: Python :: ")
+            for c in data["project"]["classifiers"]
+            if re.fullmatch(r"Programming Language :: Python :: 3\.\d+", c)
+        }
+
+        with open(".github/workflows/ci.yaml") as f:
+            ci = f.read()
+
+        # Extract the non-experimental matrix versions (the stable list)
+        match = re.search(r'python-version: \[([^\]]+)\]\s*\n\s*resolution:', ci)
+        matrix_versions = set(re.findall(r'"(3\.\d+)"', match.group(1)))
+
+        if classifier_versions != matrix_versions:
+            print(f"MISMATCH: classifiers={sorted(classifier_versions)}, matrix={sorted(matrix_versions)}")
+            sys.exit(1)
+
+        print(f"OK: {sorted(matrix_versions)}")
+        EOF
+
   check:
     if: always()
 
