@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish:
@@ -24,5 +25,3 @@ jobs:
 
     - name: Upload distributions.
       run: uv publish
-      env:
-        UV_PUBLISH_TOKEN: ${{ secrets.HATCH_INDEX_AUTH }}
