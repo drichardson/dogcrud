@@ -26,4 +26,3 @@ jobs:
       run: uv publish
       env:
         UV_PUBLISH_TOKEN: ${{ secrets.HATCH_INDEX_AUTH }}
-        UV_PUBLISH_URL: ${{ vars.HATCH_INDEX_REPO }}
