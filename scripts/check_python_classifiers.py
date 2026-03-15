@@ -34,7 +34,7 @@ if not match:
 matrix_versions = set(re.findall(r'"(3\.\d+)"', match.group(1)))
 
 if classifier_versions != matrix_versions:
-    print(f"MISMATCH")
+    print("MISMATCH")
     print(f"  classifiers: {sorted(classifier_versions)}")
     print(f"  CI matrix:   {sorted(matrix_versions)}")
     sys.exit(1)
