@@ -1,8 +1,4 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = []
-# ///
+#!/usr/bin/env -S uv run
 """
 Checks that the Python version classifiers in pyproject.toml match the
 non-experimental versions in the CI test matrix (.github/workflows/ci.yaml).

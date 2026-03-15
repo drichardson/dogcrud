@@ -44,7 +44,7 @@ jobs:
         uv run ruff check
 
     - name: Check Python classifiers match CI matrix
-      run: uv run --script scripts/check_python_classifiers.py
+      run: scripts/check_python_classifiers.py
 
     - name: Check Types
       run: uv run mypy src/dogcrud tests
