@@ -15,8 +15,12 @@ logger = logging.getLogger(__name__)
 class DatadogAPIBadRequestError(aiohttp.client_exceptions.ClientResponseError):
     """400 Bad Request error from Datadog API with error body preserved."""
 
-    def __init__(self, request_info, history, status: int, message: str, headers, error_body: str):
-        super().__init__(request_info, history, status=status, message=message, headers=headers)
+    def __init__(
+        self, request_info, history, status: int, message: str, headers, error_body: str
+    ):
+        super().__init__(
+            request_info, history, status=status, message=message, headers=headers
+        )
         self.error_body = error_body
 
 
@@ -54,9 +58,13 @@ async def get_json(path: str) -> bytes:
     while True:
         async with async_run_context().concurrent_requests_semaphore:
             t0 = time.perf_counter()
-            async with async_run_context().datadog_session.get(url, headers=headers) as resp:
+            async with async_run_context().datadog_session.get(
+                url, headers=headers
+            ) as resp:
                 duration = time.perf_counter() - t0
-                logger.debug(f"get_json: url={url}, status={resp.status}, duration={duration:.3f}s, retry={retry}")
+                logger.debug(
+                    f"get_json: url={url}, status={resp.status}, duration={duration:.3f}s, retry={retry}"
+                )
                 match resp.status:
                     case 200:
                         return await resp.read()
@@ -74,7 +82,9 @@ async def get_json(path: str) -> bytes:
                     case 429:
                         # https://docs.datadoghq.com/api/latest/rate-limits/
                         sleep_seconds = float(resp.headers["X-RateLimit-Reset"])
-                        logger.info(f"Rate limited, sleeping {sleep_seconds} seconds for {url}")
+                        logger.info(
+                            f"Rate limited, sleeping {sleep_seconds} seconds for {url}"
+                        )
                     case status if status >= 500:  # noqa: PLR2004
                         # Datadog started returning 500s pretty regularly in January 2026
                         retries_5xx += 1
@@ -102,7 +112,9 @@ async def put_json(path: str, body: bytes) -> None:
 
     async with async_run_context().concurrent_requests_semaphore:
         t0 = time.perf_counter()
-        async with async_run_context().datadog_session.put(url, data=body, headers=headers) as resp:
+        async with async_run_context().datadog_session.put(
+            url, data=body, headers=headers
+        ) as resp:
             duration = time.perf_counter() - t0
             msg = f"put_json: url={url}, body={len(body)} bytes, status={resp.status}, duration={duration:.3f}s response={await resp.text()}"
             if resp.ok:
@@ -118,7 +130,9 @@ async def patch_json(path: str, body: bytes) -> None:
 
     async with async_run_context().concurrent_requests_semaphore:
         t0 = time.perf_counter()
-        async with async_run_context().datadog_session.patch(url, data=body, headers=headers) as resp:
+        async with async_run_context().datadog_session.patch(
+            url, data=body, headers=headers
+        ) as resp:
             duration = time.perf_counter() - t0
             msg = f"patch_json: url={url}, body={len(body)} bytes, status={resp.status}, duration={duration:.3f}s response={await resp.text()}"
             if resp.ok:
@@ -134,7 +148,9 @@ async def post_json(path: str, body: bytes) -> None:
 
     async with async_run_context().concurrent_requests_semaphore:
         t0 = time.perf_counter()
-        async with async_run_context().datadog_session.post(url, data=body, headers=headers) as resp:
+        async with async_run_context().datadog_session.post(
+            url, data=body, headers=headers
+        ) as resp:
             duration = time.perf_counter() - t0
             msg = f"post_json: url={url}, body={len(body)} bytes, status={resp.status}, duration={duration:.3f}s response={await resp.text()}"
             if resp.ok:

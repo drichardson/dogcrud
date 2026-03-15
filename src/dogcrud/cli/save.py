@@ -100,8 +100,12 @@ async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
         skip_unsupported = config_context().skip_unsupported_workflows
         if skip_unsupported and resource_type.rest_path() == "v2/workflows":
             error_data = orjson.loads(e.error_body)
-            error_detail = error_data.get("errors", [{}])[0].get("detail", "Unknown error")
-            logger.warning(f"Skipping {resource_type.rest_path()}/{resource_id}: {error_detail}")
+            error_detail = error_data.get("errors", [{}])[0].get(
+                "detail", "Unknown error"
+            )
+            logger.warning(
+                f"Skipping {resource_type.rest_path()}/{resource_id}: {error_detail}"
+            )
         else:
             raise
     except aiohttp.client_exceptions.ClientResponseError:

@@ -20,7 +20,9 @@ from dogcrud.core.logging import setup_logger
 @click.option(
     "--log-level",
     default="INFO",
-    type=click.Choice(list(logging.getLevelNamesMapping().keys()), case_sensitive=False),
+    type=click.Choice(
+        list(logging.getLevelNamesMapping().keys()), case_sensitive=False
+    ),
 )
 @click.option(
     "--dd-api-key",
@@ -46,7 +48,9 @@ from dogcrud.core.logging import setup_logger
 )
 @click.option(
     "--data-dir",
-    type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=pathlib.Path),
+    type=click.Path(
+        exists=True, file_okay=False, resolve_path=True, path_type=pathlib.Path
+    ),
     default="saved",
 )
 @click.option(
