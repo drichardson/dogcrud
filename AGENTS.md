@@ -1,6 +1,6 @@
 # Agents Guide
 
-Read `DESIGN.md` first for an understanding of the codebase structure, concurrency model, and how to add new Datadog REST resources.
+Read `DESIGN.md` first for an understanding of the codebase structure, concurrency model, and how to add new Datadog REST resources. See `MAINTAINERS.md` for version bumps and other recurring tasks.
 
 ## Development Commands
 
