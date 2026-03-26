@@ -19,11 +19,23 @@ $ uv run dogcrud
 Usage: dogcrud [OPTIONS] COMMAND [ARGS]...
 ```
 
+## Updating `pyproject.toml`
+
+When updating `pyproject.toml` — whether bumping the version of dogcrud itself
+or changing any dependencies — run `uv lock` afterward to keep `uv.lock` in
+sync. Commit both files together.
+
+```sh
+uv lock
+git add pyproject.toml uv.lock
+```
+
 ## Publishing
 
 To publish a release to [PyPI](https://pypi.org/project/dogcrud/):
 
-1. Create a PR to bump the version. Edit `version` in `pyproject.toml`.
+1. Create a PR to bump the version. Edit `version` in `pyproject.toml`, then run
+   `uv lock` to sync `uv.lock`. Commit both files together.
 2. Merge the PR to main
 3. Go to [releases](https://github.com/drichardson/dogcrud/releases).
 4. Draft a new release.

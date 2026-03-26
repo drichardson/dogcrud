@@ -149,3 +149,52 @@ dogcrud list v2/my-resource
 dogcrud save v2/my-resource all
 dogcrud restore saved/v2/my-resource/<id>.json
 ```
+
+---
+
+## Child Resources (1:Many Relationships)
+
+Some Datadog resources are children of another resource — for example, incident attachments belong to incidents. These are accessed via endpoints like `GET /api/v2/incidents/{incident_id}/attachments` and have no standalone list endpoint.
+
+### Directory Convention
+
+Child resources use a **separate top-level directory** rather than nesting inside the parent's directory. The directory is named `{parent}-{child}` with the parent resource's ID as the filename:
+
+```
+saved/v2/incident-attachments/{incident_id}.json
+```
+
+**Not** nested under the parent:
+
+```
+# DON'T — mixes files and directories, causes path-prefix collisions
+saved/v2/incidents/{incident_id}/attachments.json
+```
+
+This convention exists for two reasons:
+
+1. **Path-prefix isolation** — `resource_type_for_filename()` in `data.py` matches files to resource types by substring-matching `local_path()`. If child resources lived under the parent's directory (e.g. `v2/incidents/attachments/`), files would match both the parent and child resource types.
+
+2. **Homogeneous directories** — each directory under `saved/` contains only `.json` files (no subdirectories mixed with files), keeping the structure predictable and consistent.
+
+### Implementation Pattern
+
+Child resource types implement `ResourceType` directly. The key difference from standard resources is that `list_ids()` enumerates the **parent** resource's IDs (since there is no standalone child list endpoint), and `get()` fetches the child collection for a given parent ID:
+
+- `list_ids()` — pages through the parent resource's list endpoint to yield parent IDs
+- `get(parent_id)` — `GET /api/{parent_path}/{parent_id}/{child_path}`
+- `local_path(parent_id)` — `data_dir / "{parent}-{child}/{parent_id}.json"`
+- `rest_path()` (no arg) — `"{parent}-{child}"` (used as the CLI command name)
+
+Each saved file contains the **full API response** for that parent's children (the entire list, not individual items), since the API returns all children in a single request with no per-item GET endpoint.
+
+The save flow for `dogcrud save v2/incident-attachments all`:
+
+1. `list_ids()` pages through `GET /api/v2/incidents` to collect all incident IDs
+2. `TaskGroup` fans out one task per incident ID
+3. Each task calls `get(incident_id)` → `GET /api/v2/incidents/{incident_id}/attachments`
+4. Response written to `saved/v2/incident-attachments/{incident_id}.json`
+
+### Read-Only Child Resources
+
+Some child resource endpoints only support GET (e.g., incident attachments is a Preview API with no write support). These resource types raise `NotImplementedError` from `put()` and `transform_get_to_put()`.
