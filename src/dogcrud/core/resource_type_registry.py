@@ -4,6 +4,7 @@
 from collections.abc import Sequence
 from functools import partial
 
+from dogcrud.core.incident_resource_type import IncidentResourceType
 from dogcrud.core.metric_metadata_resource_type import MetricMetadataResourceType
 from dogcrud.core.metric_resource_type import MetricResourceType
 from dogcrud.core.pagination import (
@@ -79,6 +80,9 @@ def resource_types() -> Sequence[ResourceType]:
             max_concurrency=100,
         ),
         SlackChannelResourceType(
+            max_concurrency=100,
+        ),
+        IncidentResourceType(
             max_concurrency=100,
         ),
     )
