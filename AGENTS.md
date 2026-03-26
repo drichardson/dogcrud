@@ -27,3 +27,10 @@ See the _Adding a New Datadog REST Resource_ section in `DESIGN.md` for the full
 2. Add a `StandardResourceType(...)` entry to the tuple in `resource_type_registry.py`. For non-standard APIs, subclass `StandardResourceType` or implement `ResourceType` directly.
 3. If the GET response shape differs from what PUT expects, supply a `get_to_put_transformer`.
 4. Verify with `uv run dogcrud list <rest-path>` and `uv run dogcrud save <rest-path> all`.
+
+## When making changes always use Pull Requests
+
+1. Create a branch
+2. Push to a PR.
+
+Don't push to main. You can make several commits but never push them to main, always to a branch.
