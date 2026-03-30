@@ -73,7 +73,7 @@ class IncidentResourceType(ResourceType):
         (e.g. ``dogcrud save v2/incidents <id>``).
         """
         if resource_id in self._cache:
-            return self._cache.pop(resource_id)
+            return self._cache[resource_id]
 
         # Fallback: individual GET (e.g. single-item save)
         async with self.concurrency_semaphore:
