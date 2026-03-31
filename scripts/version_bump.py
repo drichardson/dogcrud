@@ -20,12 +20,13 @@ with open(path, "rb") as f:
 old = data["project"]["version"]
 major, minor, patch = (int(x) for x in old.split("."))
 
-if part == "major":
-    major, minor, patch = major + 1, 0, 0
-elif part == "minor":
-    major, minor, patch = major, minor + 1, 0
-else:
-    major, minor, patch = major, minor, patch + 1
+match part:
+    case "major":
+        major, minor, patch = major + 1, 0, 0
+    case "minor":
+        major, minor, patch = major, minor + 1, 0
+    case "patch":
+        major, minor, patch = major, minor, patch + 1
 
 new = f"{major}.{minor}.{patch}"
 path.write_text(path.read_text().replace(f'version = "{old}"', f'version = "{new}"', 1))
