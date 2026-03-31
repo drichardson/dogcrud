@@ -17,7 +17,7 @@ tasks:
 
   test:
     desc: Run tests
-    cmd: uv run pytest
+    cmd: '[ -z "$UV_RESOLUTION" ] && unset UV_RESOLUTION; uv run pytest'
 
   check-classifiers:
     desc: Verify pyproject.toml classifiers match CI matrix
