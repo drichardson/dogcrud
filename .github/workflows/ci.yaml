@@ -13,16 +13,11 @@ jobs:
         python-version: ["3.12", "3.13", "3.14"]
         uv_resolution: ["highest", "lowest-direct"]
         experimental: [false]
-        primary: [false]
         include:
           - uv_resolution: "highest"
             uv_locked: "true"
           - uv_resolution: "lowest-direct"
             uv_locked: "false"
-          - python-version: "3.14"
-            uv_resolution: "highest"
-            uv_locked: "true"
-            primary: true
           - python-version: "3.15"
             uv_resolution: "highest"
             uv_locked: "true"
@@ -39,14 +34,18 @@ jobs:
     - name: Install Task
       uses: go-task/setup-task@v1
 
+    - name: Determine primary Python version
+      id: primary
+      run: echo "version=$(scripts/ci_primary_python.py)" >> "$GITHUB_OUTPUT"
+
     - name: Run Tests
-      run: ${{ matrix.primary && 'task test-coverage' || 'task test' }}
+      run: task test
       env:
         UV_LOCKED: ${{ matrix.uv_locked }}
         UV_RESOLUTION: ${{ matrix.uv_resolution }}
 
     - name: Upload coverage report
-      if: matrix.primary
+      if: steps.primary.outputs.version == matrix.python-version && matrix.uv_resolution == 'highest'
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
