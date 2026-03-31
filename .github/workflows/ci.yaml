@@ -34,8 +34,8 @@ jobs:
     - name: Install Task
       uses: go-task/setup-task@v1
 
-    - name: Determine primary Python version
-      id: primary
+    - name: Determine Python version for coverage upload
+      id: coverage_upload_python
       run: echo "version=$(scripts/ci_primary_python.py)" >> "$GITHUB_OUTPUT"
 
     - name: Run Tests
@@ -45,7 +45,7 @@ jobs:
         UV_RESOLUTION: ${{ matrix.uv_resolution }}
 
     - name: Upload coverage report
-      if: steps.primary.outputs.version == matrix.python-version && matrix.uv_resolution == 'highest'
+      if: steps.coverage_upload_python.outputs.version == matrix.python-version && matrix.uv_resolution == 'highest'
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
