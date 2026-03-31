@@ -12,12 +12,15 @@ brew install uv go-task  # macOS
 Use `task` for day-to-day development (defined in `Taskfile.dist.yaml`):
 
 ```sh
-task test                # run tests
-task typecheck           # type checking
-task lint                # check formatting and lint
-task format              # auto-format code
-task check               # run all checks (lint + typecheck + test)
-task install-git-hooks   # install pre-push hook (recommended for new contributors)
+task test                        # run tests (with coverage)
+task typecheck                   # type checking
+task lint                        # check formatting and lint
+task format                      # auto-format code
+task check                       # run all checks (lint + typecheck + test)
+task install-git-hooks           # install pre-push hook (recommended for new contributors)
+task version-bump -- patch       # bump patch version (e.g. 1.10.0 -> 1.10.1)
+task version-bump -- minor       # bump minor version (e.g. 1.10.0 -> 1.11.0)
+task version-bump -- major       # bump major version (e.g. 1.10.0 -> 2.0.0)
 ```
 
 You can create a local `Taskfile.yaml` to override or extend tasks for your
@@ -41,12 +44,18 @@ Usage: dogcrud [OPTIONS] COMMAND [ARGS]...
 
 ## Updating `pyproject.toml`
 
-When updating `pyproject.toml` — whether bumping the version of dogcrud itself
-or changing any dependencies — run `uv lock` afterward to keep `uv.lock` in
-sync. Commit both files together.
+When changing dependencies in `pyproject.toml`, run `uv lock` afterward to keep
+`uv.lock` in sync. Commit both files together.
 
 ```sh
 uv lock
+git add pyproject.toml uv.lock
+```
+
+To bump the package version use `task version-bump` — it updates both files in one step:
+
+```sh
+task version-bump -- minor
 git add pyproject.toml uv.lock
 ```
 
@@ -54,8 +63,8 @@ git add pyproject.toml uv.lock
 
 To publish a release to [PyPI](https://pypi.org/project/dogcrud/):
 
-1. Create a PR to bump the version. Edit `version` in `pyproject.toml`, then run
-   `uv lock` to sync `uv.lock`. Commit both files together.
+1. Create a PR to bump the version using `task version-bump -- minor` (or `patch`/`major`).
+   Commit both `pyproject.toml` and `uv.lock` together.
 2. Merge the PR to main
 3. Go to [releases](https://github.com/drichardson/dogcrud/releases).
 4. Draft a new release.
