@@ -3,3 +3,4 @@ __pycache__/
 dist/
 saved/
 .venv/
+Taskfile.yaml

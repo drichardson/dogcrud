@@ -26,8 +26,18 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Run Tests
-      run: uv run ${{ matrix.resolution == 'lowest-direct' && '--resolution lowest-direct' || '' }} pytest
+    - name: Install Task
+      uses: go-task/setup-task@v1
+
+    - name: Run Tests (locked)
+      if: matrix.resolution == 'locked'
+      run: task test
+
+    - name: Run Tests (lowest-direct)
+      if: matrix.resolution == 'lowest-direct'
+      run: task test
+      env:
+        UV_RESOLUTION: lowest-direct
 
   lint:
     runs-on: ubuntu-latest
@@ -38,16 +48,17 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v7
 
-    - name: Formatting and checks
-      run: |
-        uv run ruff format --check
-        uv run ruff check
+    - name: Install Task
+      uses: go-task/setup-task@v1
+
+    - name: Lint
+      run: task lint
 
     - name: Check Python classifiers match CI matrix
-      run: scripts/check_python_classifiers.py
+      run: task check-classifiers
 
-    - name: Check Types
-      run: uv run mypy src/dogcrud tests
+    - name: Typecheck
+      run: task typecheck
 
   check:
     if: always()
