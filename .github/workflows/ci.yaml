@@ -14,6 +14,8 @@ jobs:
         resolution: ["locked", "lowest-direct"]
         experimental: [false]
         include:
+          - resolution: "lowest-direct"
+            uv_resolution: "lowest-direct"
           - python-version: "3.15"
             resolution: "locked"
             experimental: true
@@ -29,15 +31,10 @@ jobs:
     - name: Install Task
       uses: go-task/setup-task@v1
 
-    - name: Run Tests (locked)
-      if: matrix.resolution == 'locked'
-      run: task test
-
-    - name: Run Tests (lowest-direct)
-      if: matrix.resolution == 'lowest-direct'
+    - name: Run Tests
       run: task test
       env:
-        UV_RESOLUTION: lowest-direct
+        UV_RESOLUTION: ${{ matrix.uv_resolution }}
 
   lint:
     runs-on: ubuntu-latest
