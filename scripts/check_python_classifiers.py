@@ -9,6 +9,8 @@ import sys
 import tomllib
 from pathlib import Path
 
+import yaml
+
 root = Path(__file__).parent.parent
 
 with open(root / "pyproject.toml", "rb") as f:
@@ -20,14 +22,10 @@ classifier_versions = {
     if re.fullmatch(r"Programming Language :: Python :: \d+\.\d+", c)
 }
 
-ci = (root / ".github/workflows/ci.yaml").read_text()
+ci = yaml.safe_load((root / ".github/workflows/ci.yaml").read_text())
 
-match = re.search(r"python-version: \[([^\]]+)\]\s*\n\s*uv_resolution:", ci)
-if not match:
-    print("ERROR: could not find python-version matrix in ci.yaml")
-    sys.exit(1)
-
-matrix_versions = set(re.findall(r'"(\d+\.\d+)"', match.group(1)))
+matrix = ci["jobs"]["tests"]["strategy"]["matrix"]
+matrix_versions = {str(v) for v in matrix["python-version"]}
 
 if classifier_versions != matrix_versions:
     print("MISMATCH")
