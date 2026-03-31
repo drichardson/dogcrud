@@ -29,3 +29,21 @@ tasks:
       - task: lint
       - task: typecheck
       - task: test
+
+  git-hook:
+    desc: Checks run by the pre-push git hook (lint, typecheck, test)
+    cmds:
+      - task: lint
+      - task: typecheck
+      - task: test
+
+  install-git-hooks:
+    desc: Install git hooks (pre-push runs task git-hook)
+    cmds:
+      - |
+        cat > .git/hooks/pre-push << 'EOF'
+        #!/bin/sh
+        exec task git-hook
+        EOF
+      - chmod +x .git/hooks/pre-push
+      - echo "Installed .git/hooks/pre-push"

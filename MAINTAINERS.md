@@ -12,11 +12,12 @@ brew install uv go-task  # macOS
 Use `task` for day-to-day development (defined in `Taskfile.dist.yaml`):
 
 ```sh
-task test            # run tests
-task typecheck       # type checking
-task lint            # check formatting and lint
-task format          # auto-format code
-task check           # run all checks (lint + typecheck + test)
+task test                # run tests
+task typecheck           # type checking
+task lint                # check formatting and lint
+task format              # auto-format code
+task check               # run all checks (lint + typecheck + test)
+task install-git-hooks   # install pre-push hook (recommended for new contributors)
 ```
 
 You can create a local `Taskfile.yaml` to override or extend tasks for your
