@@ -29,10 +29,15 @@ jobs:
     - name: Install Task
       uses: go-task/setup-task@v1
 
-    - name: Run Tests
+    - name: Run Tests (locked)
+      if: matrix.resolution == 'locked'
+      run: task test
+
+    - name: Run Tests (lowest-direct)
+      if: matrix.resolution == 'lowest-direct'
       run: task test
       env:
-        UV_RESOLUTION: ${{ matrix.resolution == 'lowest-direct' && 'lowest-direct' || '' }}
+        UV_RESOLUTION: lowest-direct
 
   lint:
     runs-on: ubuntu-latest
