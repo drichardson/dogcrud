@@ -32,8 +32,8 @@ jobs:
     - name: Run Tests
       run: task test
       env:
-        UV_LOCKED: ${{ matrix.resolution == 'locked' && 'true' || '' }}
-        UV_RESOLUTION: ${{ matrix.resolution == 'lowest-direct' && 'lowest-direct' || '' }}
+        UV_LOCKED: ${{ matrix.resolution == 'locked' && 'true' || 'false' }}
+        UV_RESOLUTION: ${{ matrix.resolution == 'lowest-direct' && 'lowest-direct' || 'highest' }}
 
   lint:
     runs-on: ubuntu-latest
