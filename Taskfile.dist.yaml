@@ -1,0 +1,55 @@
+version: "3"
+
+tasks:
+  format:
+    desc: Auto-format code with ruff
+    cmd: uv run ruff format
+
+  lint:
+    desc: Check formatting and run linter
+    cmds:
+      - uv run ruff format --check
+      - uv run ruff check
+
+  typecheck:
+    desc: Run mypy type checker
+    cmd: uv run mypy src/dogcrud tests
+
+  test:
+    desc: Run tests with coverage report (HTML output in htmlcov/)
+    cmd: uv run pytest --cov --cov-report=term --cov-report=html:htmlcov
+
+  check-classifiers:
+    desc: Verify pyproject.toml classifiers match CI matrix
+    cmd: scripts/check_python_classifiers.py
+
+  check:
+    desc: Run all checks (lint, typecheck, test)
+    cmds:
+      - task: lint
+      - task: typecheck
+      - task: test
+
+  git-hook:
+    desc: Checks run by the pre-push git hook (lint, typecheck, test)
+    cmds:
+      - task: lint
+      - task: typecheck
+      - task: test
+
+  install-git-hooks:
+    desc: Install git hooks (pre-push runs task git-hook)
+    cmds:
+      - |
+        cat > .git/hooks/pre-push << 'EOF'
+        #!/bin/sh
+        exec task git-hook
+        EOF
+      - chmod +x .git/hooks/pre-push
+      - echo "Installed .git/hooks/pre-push"
+
+  version-bump:
+    desc: "Bump version in pyproject.toml and run uv lock (usage: task version-bump -- patch|minor|major)"
+    cmds:
+      - scripts/version_bump.py {{.CLI_ARGS}}
+      - uv lock

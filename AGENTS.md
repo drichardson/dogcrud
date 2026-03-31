@@ -4,9 +4,21 @@ Read `DESIGN.md` first for an understanding of the codebase structure, concurren
 
 ## Development Commands
 
+Preferred: use [Task](https://taskfile.dev) (`brew install go-task` on macOS):
+
+```sh
+task test            # run tests
+task typecheck       # type checking
+task lint            # check formatting and lint
+task format          # auto-format (local dev)
+task check           # run all checks (lint + typecheck + test)
+```
+
+Equivalent raw commands:
+
 ```sh
 uv run pytest                          # run tests
-uv run mypy src                        # type checking
+uv run mypy src/dogcrud tests          # type checking
 uv run ruff format && uv run ruff check  # format and lint
 ```
 

@@ -34,12 +34,18 @@ class IncidentResourceType(ResourceType):
     Get:    GET /api/v2/incidents/{id}       (response wrapped in "data" key)
     Update: PATCH /api/v2/incidents/{id}    (PATCH, not PUT)
 
+    The list endpoint returns the same "data" object per incident as the
+    individual GET endpoint, so we cache each item from the list pages and
+    serve it from get() without issuing a second HTTP request.
+
     https://docs.datadoghq.com/api/latest/incidents/
     """
 
     def __init__(self, max_concurrency: int, *, disabled: bool = False) -> None:
         self.concurrency_semaphore = asyncio.BoundedSemaphore(max_concurrency)
         self.disabled = disabled
+        # Cache populated by list_ids(); maps incident ID -> raw {"data": ...} bytes
+        self._cache: dict[IDType, bytes] = {}
 
     @override
     def rest_path(self, resource_id: IDType | None = None) -> str:
@@ -60,6 +66,16 @@ class IncidentResourceType(ResourceType):
 
     @override
     async def get(self, resource_id: IDType) -> bytes:
+        """
+        Return the incident JSON. Uses the list-page cache when available
+        (populated by list_ids()) so no additional HTTP request is needed.
+        Falls back to the individual GET endpoint when called in isolation
+        (e.g. ``dogcrud save v2/incidents <id>``).
+        """
+        if resource_id in self._cache:
+            return self._cache[resource_id]
+
+        # Fallback: individual GET (e.g. single-item save)
         async with self.concurrency_semaphore:
             return await rest.get_json(f"api/{self.rest_path(resource_id)}")
 
@@ -83,7 +99,9 @@ class IncidentResourceType(ResourceType):
         async for page in _PAGINATION.pages(
             f"api/{self.rest_path()}", self.concurrency_semaphore
         ):
-            for id_ in page.ids:
+            for id_, item in zip(page.ids, page.items):
+                # Wrap the item in {"data": ...} to match the individual GET shape
+                self._cache[id_] = orjson.dumps({"data": item})
                 yield id_
 
     @override
