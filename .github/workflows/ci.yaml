@@ -14,13 +14,8 @@ jobs:
         uv_resolution: ["highest", "lowest-direct"]
         experimental: [false]
         include:
-          - uv_resolution: "highest"
-            uv_locked: "true"
-          - uv_resolution: "lowest-direct"
-            uv_locked: "false"
           - python-version: "3.15"
             uv_resolution: "highest"
-            uv_locked: "true"
             experimental: true
 
     steps:
@@ -37,7 +32,7 @@ jobs:
     - name: Run Tests
       run: task test
       env:
-        UV_LOCKED: ${{ matrix.uv_locked }}
+        UV_LOCKED: "true"
         UV_RESOLUTION: ${{ matrix.uv_resolution }}
 
   lint:
