@@ -50,9 +50,6 @@ tasks:
 
   version-bump:
     desc: "Bump version in pyproject.toml and run uv lock (usage: task version-bump -- patch|minor|major)"
-    preconditions:
-      - sh: '[ "{{.CLI_ARGS}}" = "patch" ] || [ "{{.CLI_ARGS}}" = "minor" ] || [ "{{.CLI_ARGS}}" = "major" ]'
-        msg: "Usage: task version-bump -- patch|minor|major"
     cmds:
       - scripts/version_bump.py {{.CLI_ARGS}}
       - uv lock
