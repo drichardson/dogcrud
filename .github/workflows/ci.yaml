@@ -11,11 +11,16 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.12", "3.13", "3.14"]
-        resolution: ["locked", "lowest-direct"]
+        uv_resolution: ["highest", "lowest-direct"]
         experimental: [false]
         include:
+          - uv_resolution: "highest"
+            uv_locked: "true"
+          - uv_resolution: "lowest-direct"
+            uv_locked: "false"
           - python-version: "3.15"
-            resolution: "locked"
+            uv_resolution: "highest"
+            uv_locked: "true"
             experimental: true
 
     steps:
@@ -32,8 +37,8 @@ jobs:
     - name: Run Tests
       run: task test
       env:
-        UV_LOCKED: ${{ matrix.resolution == 'locked' && 'true' || 'false' }}
-        UV_RESOLUTION: ${{ matrix.resolution == 'lowest-direct' && 'lowest-direct' || 'highest' }}
+        UV_LOCKED: ${{ matrix.uv_locked }}
+        UV_RESOLUTION: ${{ matrix.uv_resolution }}
 
   lint:
     runs-on: ubuntu-latest
