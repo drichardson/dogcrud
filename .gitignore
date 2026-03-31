@@ -4,3 +4,4 @@ dist/
 saved/
 .venv/
 Taskfile.yaml
+htmlcov/

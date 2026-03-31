@@ -19,6 +19,10 @@ tasks:
     desc: Run tests
     cmd: uv run pytest
 
+  test-coverage:
+    desc: Run tests with coverage report (HTML output in htmlcov/)
+    cmd: uv run pytest --cov --cov-report=term --cov-report=html:htmlcov
+
   check-classifiers:
     desc: Verify pyproject.toml classifiers match CI matrix
     cmd: scripts/check_python_classifiers.py

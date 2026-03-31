@@ -13,11 +13,16 @@ jobs:
         python-version: ["3.12", "3.13", "3.14"]
         uv_resolution: ["highest", "lowest-direct"]
         experimental: [false]
+        primary: [false]
         include:
           - uv_resolution: "highest"
             uv_locked: "true"
           - uv_resolution: "lowest-direct"
             uv_locked: "false"
+          - python-version: "3.14"
+            uv_resolution: "highest"
+            uv_locked: "true"
+            primary: true
           - python-version: "3.15"
             uv_resolution: "highest"
             uv_locked: "true"
@@ -35,10 +40,17 @@ jobs:
       uses: go-task/setup-task@v1
 
     - name: Run Tests
-      run: task test
+      run: ${{ matrix.primary && 'task test-coverage' || 'task test' }}
       env:
         UV_LOCKED: ${{ matrix.uv_locked }}
         UV_RESOLUTION: ${{ matrix.uv_resolution }}
+
+    - name: Upload coverage report
+      if: matrix.primary
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: htmlcov/
 
   lint:
     runs-on: ubuntu-latest
