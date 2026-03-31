@@ -16,8 +16,8 @@ tasks:
     cmd: uv run mypy src/dogcrud tests
 
   test:
-    desc: Run tests
-    cmd: uv run pytest
+    desc: Run tests with coverage report (HTML output in htmlcov/)
+    cmd: uv run pytest --cov --cov-report=term --cov-report=html:htmlcov
 
   check-classifiers:
     desc: Verify pyproject.toml classifiers match CI matrix

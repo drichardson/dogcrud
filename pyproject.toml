@@ -46,6 +46,7 @@ dev = [
   "types-aiofiles",
   "ruff",
   "pyyaml>=6.0.2",
+  "pytest-cov>=7.1.0",
 ]
 
 [tool.coverage.run]
