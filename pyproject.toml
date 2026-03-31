@@ -45,7 +45,7 @@ dev = [
   "mypy>=1.0.0",
   "types-aiofiles",
   "ruff",
-  "pyyaml>=6",
+  "pyyaml>=6.0.2",
 ]
 
 [tool.coverage.run]
