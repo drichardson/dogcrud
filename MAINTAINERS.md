@@ -1,7 +1,26 @@
 # Maintainers Guide
 
-This package is developed using [uv](https://docs.astral.sh/uv/). You'll
-need to install uv (e.g. `brew install uv` on macos).
+This package is developed using [uv](https://docs.astral.sh/uv/) and
+[Task](https://taskfile.dev). Install both:
+
+```sh
+brew install uv go-task  # macOS
+```
+
+## Common tasks
+
+Use `task` for day-to-day development (defined in `Taskfile.dist.yaml`):
+
+```sh
+task test            # run tests
+task typecheck       # type checking
+task lint            # check formatting and lint
+task format          # auto-format code
+task check           # run all checks (lint + typecheck + test)
+```
+
+You can create a local `Taskfile.yaml` to override or extend tasks for your
+own environment — it is gitignored.
 
 ## Some `uv` commands you will use
 

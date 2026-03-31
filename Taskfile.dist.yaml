@@ -1,0 +1,31 @@
+version: "3"
+
+tasks:
+  format:
+    desc: Auto-format code with ruff
+    cmd: uv run ruff format
+
+  lint:
+    desc: Check formatting and run linter
+    cmds:
+      - uv run ruff format --check
+      - uv run ruff check
+
+  typecheck:
+    desc: Run mypy type checker
+    cmd: uv run mypy src/dogcrud tests
+
+  test:
+    desc: Run tests
+    cmd: uv run pytest
+
+  check-classifiers:
+    desc: Verify pyproject.toml classifiers match CI matrix
+    cmd: scripts/check_python_classifiers.py
+
+  check:
+    desc: Run all checks (lint, typecheck, test)
+    cmds:
+      - task: lint
+      - task: typecheck
+      - task: test
