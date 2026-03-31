@@ -22,7 +22,7 @@ classifier_versions = {
 
 ci = (root / ".github/workflows/ci.yaml").read_text()
 
-match = re.search(r"python-version: \[([^\]]+)\]\s*\n\s*resolution:", ci)
+match = re.search(r"python-version: \[([^\]]+)\]\s*\n\s*uv_resolution:", ci)
 if not match:
     print("ERROR: could not find python-version matrix in ci.yaml")
     sys.exit(1)
