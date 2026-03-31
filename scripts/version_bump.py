@@ -7,11 +7,7 @@ import sys
 import tomllib
 from pathlib import Path
 
-if len(sys.argv) != 2 or sys.argv[1] not in ("patch", "minor", "major"):
-    print("Usage: version_bump.py patch|minor|major", file=sys.stderr)
-    sys.exit(1)
-
-part = sys.argv[1]
+part = sys.argv[1] if len(sys.argv) == 2 else None
 path = Path(__file__).parent.parent / "pyproject.toml"
 
 with open(path, "rb") as f:
@@ -27,6 +23,9 @@ match part:
         major, minor, patch = major, minor + 1, 0
     case "patch":
         major, minor, patch = major, minor, patch + 1
+    case _:
+        print("Usage: version_bump.py patch|minor|major", file=sys.stderr)
+        sys.exit(1)
 
 new = f"{major}.{minor}.{patch}"
 path.write_text(path.read_text().replace(f'version = "{old}"', f'version = "{new}"', 1))
