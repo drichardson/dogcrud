@@ -36,7 +36,7 @@ jobs:
 
     - name: Determine Python version for coverage upload
       id: coverage_upload_python
-      run: echo "version=$(scripts/ci_primary_python.py)" >> "$GITHUB_OUTPUT"
+      run: echo "version=$(scripts/coverage_upload_python_version.py)" >> "$GITHUB_OUTPUT"
 
     - name: Run Tests
       run: task test
