@@ -46,7 +46,6 @@ dev = [
   "types-aiofiles",
   "ruff",
   "pyyaml>=6",
-  "types-pyyaml",
 ]
 
 [tool.coverage.run]
