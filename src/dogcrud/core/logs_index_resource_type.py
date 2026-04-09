@@ -17,10 +17,12 @@ def _strip_read_only_fields(data: bytes) -> bytes:
     """
     Strip read-only fields from the GET response before sending to PUT.
 
-    The `is_rate_limited` field is returned by GET but is not accepted by PUT.
+    The `is_rate_limited` and `name` fields are returned by GET but are
+    not accepted by PUT.
     """
     parsed = orjson.loads(data)
     parsed.pop("is_rate_limited", None)
+    parsed.pop("name", None)
     return orjson.dumps(parsed)
 
 
