@@ -8,6 +8,7 @@ import click
 import orjson
 
 from dogcrud.core.context import config_context
+from dogcrud.core.logs_index_resource_type import LogsIndexResourceType
 from dogcrud.core.metric_metadata_resource_type import MetricMetadataResourceType
 from dogcrud.core.metric_resource_type import MetricResourceType
 from dogcrud.core.resource_type import ResourceType
@@ -94,6 +95,12 @@ async def list_all_resources_of_type(
             # Metric types override list_ids and don't support standard pagination
             items = [
                 {"id": resource_id} async for resource_id in resource_type.list_ids()
+            ]
+        case LogsIndexResourceType():
+            # Log indexes use `name` as their identifier rather than `id`
+            items = [
+                {"id": resource_id, "name": resource_id}
+                async for resource_id in resource_type.list_ids()
             ]
         case StandardResourceType():
             # StandardResourceType has pagination_strategy which provides richer item details
