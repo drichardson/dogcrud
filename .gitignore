@@ -1,7 +1,6 @@
-.envrc
+/.coverage
+/.envrc
+/.venv/
+/htmlcov/
+/saved/
 __pycache__/
-dist/
-saved/
-.venv/
-Taskfile.yaml
-htmlcov/
