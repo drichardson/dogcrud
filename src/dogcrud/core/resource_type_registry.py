@@ -8,6 +8,7 @@ from dogcrud.core.incident_attachment_resource_type import (
     IncidentAttachmentResourceType,
 )
 from dogcrud.core.incident_resource_type import IncidentResourceType
+from dogcrud.core.logs_index_resource_type import LogsIndexResourceType
 from dogcrud.core.metric_metadata_resource_type import MetricMetadataResourceType
 from dogcrud.core.metric_resource_type import MetricResourceType
 from dogcrud.core.pagination import (
@@ -49,6 +50,9 @@ def resource_types() -> Sequence[ResourceType]:
             webpage_base_path="logs/pipelines/pipeline/edit",
             max_concurrency=100,
             pagination_strategy=NoPagination(),
+        ),
+        LogsIndexResourceType(
+            max_concurrency=100,
         ),
         StandardResourceType(
             rest_base_path="v1/slo",
