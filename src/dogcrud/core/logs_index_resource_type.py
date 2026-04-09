@@ -5,6 +5,7 @@ from collections.abc import AsyncGenerator
 from pathlib import Path
 from typing import override
 
+import aiohttp.client_exceptions
 import orjson
 
 from dogcrud.core import rest
@@ -53,6 +54,20 @@ class LogsIndexResourceType(StandardResourceType):
         parsed = orjson.loads(data)
         for index in parsed["indexes"]:
             yield index["name"]
+
+    @override
+    async def put(self, resource_id: IDType, data: bytes) -> None:
+        try:
+            await super().put(resource_id, data)
+        except aiohttp.client_exceptions.ClientResponseError as e:
+            if e.status == 409:  # noqa: PLR2004
+                msg = (
+                    f"Cannot restore log index '{resource_id}': Datadog does not allow "
+                    f"reusing a deleted index name. You must create a new index with a "
+                    f"different name via the Datadog UI."
+                )
+                raise RuntimeError(msg) from e
+            raise
 
     @override
     def webpage_url(self, resource_id: IDType) -> str:
