@@ -107,12 +107,14 @@ The CLI also raises the OS file descriptor limit to at least 4096 at startup to 
 
 ```python
 # In resource_type_registry.py, add to the tuple in resource_types():
-StandardResourceType(
-    rest_base_path="v2/my-resource",
-    webpage_base_path="my-resource",
-    max_concurrency=100,
-    pagination_strategy=NoPagination(items_key="data"),
-),
+(
+    StandardResourceType(
+        rest_base_path="v2/my-resource",
+        webpage_base_path="my-resource",
+        max_concurrency=100,
+        pagination_strategy=NoPagination(items_key="data"),
+    ),
+)
 ```
 
 **Custom path** — subclass `StandardResourceType` or implement `ResourceType` directly when the resource needs non-standard behavior (e.g., compound IDs, a different HTTP method for updates, a non-standard list endpoint).
