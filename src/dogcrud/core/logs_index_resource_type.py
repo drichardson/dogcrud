@@ -60,7 +60,7 @@ class LogsIndexResourceType(StandardResourceType):
         try:
             await super().put(resource_id, data)
         except aiohttp.client_exceptions.ClientResponseError as e:
-            if e.status == 409:  # noqa: PLR2004
+            if e.status == 409:
                 msg = (
                     f"Cannot restore log index '{resource_id}': Datadog does not allow "
                     f"reusing a deleted index name. You must create a new index with a "

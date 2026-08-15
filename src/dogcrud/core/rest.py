@@ -85,7 +85,7 @@ async def get_json(path: str) -> bytes:
                         logger.info(
                             f"Rate limited, sleeping {sleep_seconds} seconds for {url}"
                         )
-                    case status if status >= 500:  # noqa: PLR2004
+                    case status if status >= 500:
                         # Datadog started returning 500s pretty regularly in January 2026
                         retries_5xx += 1
                         if retries_5xx > max_retries_5xx:

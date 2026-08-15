@@ -14,15 +14,15 @@ with open(path, "rb") as f:
     data = tomllib.load(f)
 
 old = data["project"]["version"]
-major, minor, patch = (int(x) for x in old.split("."))
+cur_major, cur_minor, cur_patch = (int(x) for x in old.split("."))
 
 match part:
     case "major":
-        major, minor, patch = major + 1, 0, 0
+        major, minor, patch = cur_major + 1, 0, 0
     case "minor":
-        major, minor, patch = major, minor + 1, 0
+        major, minor, patch = cur_major, cur_minor + 1, 0
     case "patch":
-        major, minor, patch = major, minor, patch + 1
+        major, minor, patch = cur_major, cur_minor, cur_patch + 1
     case _:
         print("Usage: version_bump.py patch|minor|major", file=sys.stderr)
         sys.exit(1)
