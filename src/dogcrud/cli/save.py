@@ -3,7 +3,6 @@
 
 import asyncio
 import logging
-from http import HTTPStatus
 
 import aiohttp.client_exceptions
 import click
@@ -116,7 +115,7 @@ async def save_resource(
     except aiohttp.client_exceptions.ClientResponseError as e:
         # Resources with restricted access (e.g. a dashboard restricted to
         # specific users) shouldn't abort saving all resources of a type
-        if skip_forbidden and e.status == HTTPStatus.FORBIDDEN:
+        if skip_forbidden and e.status == 403:
             logger.warning(
                 f"Skipping {resource_type.rest_path(resource_id)}: 403 Forbidden"
             )
