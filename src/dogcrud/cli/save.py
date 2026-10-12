@@ -3,6 +3,7 @@
 
 import asyncio
 import logging
+from http import HTTPStatus
 
 import aiohttp.client_exceptions
 import click
@@ -82,13 +83,26 @@ async def save_all_resources_of_type(resource_type: ResourceType) -> None:
 
     async with asyncio.TaskGroup() as tg:
         async for resource_id in resource_type.list_ids():
-            tg.create_task(save_resource(resource_type, str(resource_id)))
+            tg.create_task(
+                save_resource(resource_type, str(resource_id), skip_forbidden=True)
+            )
             num_saved += 1
 
     logger.info(f"{prefix} Saved {num_saved} items.")
 
 
-async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
+async def save_resource(
+    resource_type: ResourceType, resource_id: str, skip_forbidden: bool = False
+) -> None:
+    """
+    Save a single resource to the local file system.
+
+    If skip_forbidden is True, a 403 Forbidden response is logged and the
+    resource is skipped instead of raising. This is used when saving all
+    resources of a type, where one resource with restricted access (for
+    example, a dashboard restricted to specific users) shouldn't abort the
+    whole save.
+    """
     try:
         json = await resource_type.get(resource_id)
         filename = resource_type.local_path(resource_id)
@@ -108,6 +122,10 @@ async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
             )
         else:
             raise
-    except aiohttp.client_exceptions.ClientResponseError:
-        # Re-raise other HTTP errors
-        raise
+    except aiohttp.client_exceptions.ClientResponseError as e:
+        if skip_forbidden and e.status == HTTPStatus.FORBIDDEN:
+            logger.warning(
+                f"Skipping {resource_type.rest_path(resource_id)}: 403 Forbidden"
+            )
+        else:
+            raise
