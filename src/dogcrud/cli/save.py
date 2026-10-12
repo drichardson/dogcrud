@@ -94,15 +94,6 @@ async def save_all_resources_of_type(resource_type: ResourceType) -> None:
 async def save_resource(
     resource_type: ResourceType, resource_id: str, skip_forbidden: bool = False
 ) -> None:
-    """
-    Save a single resource to the local file system.
-
-    If skip_forbidden is True, a 403 Forbidden response is logged and the
-    resource is skipped instead of raising. This is used when saving all
-    resources of a type, where one resource with restricted access (for
-    example, a dashboard restricted to specific users) shouldn't abort the
-    whole save.
-    """
     try:
         json = await resource_type.get(resource_id)
         filename = resource_type.local_path(resource_id)
@@ -123,6 +114,8 @@ async def save_resource(
         else:
             raise
     except aiohttp.client_exceptions.ClientResponseError as e:
+        # Resources with restricted access (e.g. a dashboard restricted to
+        # specific users) shouldn't abort saving all resources of a type
         if skip_forbidden and e.status == HTTPStatus.FORBIDDEN:
             logger.warning(
                 f"Skipping {resource_type.rest_path(resource_id)}: 403 Forbidden"
