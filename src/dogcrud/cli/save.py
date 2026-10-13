@@ -82,13 +82,17 @@ async def save_all_resources_of_type(resource_type: ResourceType) -> None:
 
     async with asyncio.TaskGroup() as tg:
         async for resource_id in resource_type.list_ids():
-            tg.create_task(save_resource(resource_type, str(resource_id)))
+            tg.create_task(
+                save_resource(resource_type, str(resource_id), skip_forbidden=True)
+            )
             num_saved += 1
 
     logger.info(f"{prefix} Saved {num_saved} items.")
 
 
-async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
+async def save_resource(
+    resource_type: ResourceType, resource_id: str, skip_forbidden: bool = False
+) -> None:
     try:
         json = await resource_type.get(resource_id)
         filename = resource_type.local_path(resource_id)
@@ -108,6 +112,12 @@ async def save_resource(resource_type: ResourceType, resource_id: str) -> None:
             )
         else:
             raise
-    except aiohttp.client_exceptions.ClientResponseError:
-        # Re-raise other HTTP errors
-        raise
+    except aiohttp.client_exceptions.ClientResponseError as e:
+        # Resources with restricted access (e.g. a dashboard restricted to
+        # specific users) shouldn't abort saving all resources of a type
+        if skip_forbidden and e.status == 403:
+            logger.warning(
+                f"Skipping {resource_type.rest_path(resource_id)}: 403 Forbidden"
+            )
+        else:
+            raise
