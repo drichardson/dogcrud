@@ -195,11 +195,11 @@ class CursorMetadataModel(BaseModel):
 
 
 class CursorLinksModel(BaseModel):
-    first: str | None
-    last: str | None
-    next: str | None
-    prev: str | None
-    self: str | None
+    first: str | None = None
+    last: str | None = None
+    next: str | None = None
+    prev: str | None = None
+    self: str | None = None
 
 
 class CursorDataItemModel(BaseModel):
